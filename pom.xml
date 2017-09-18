@@ -14,7 +14,7 @@
         <module>webServerMQ</module>
         <module>zxing</module>
         <module>baseSpringBoot</module>
-        <module>../scheduledServer</module>
+        <module>thumbnailator</module>
     </modules>
 
     <properties>
