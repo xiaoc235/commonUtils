@@ -15,6 +15,41 @@ import java.io.OutputStream;
  */
 public class ThumbnailatorUtils {
 
+
+
+    private static String thumb_suffix = "_tub";
+
+
+
+
+
+    /**
+     * 生成压缩图片， 只压缩图片大小
+     * @user jianghaoming
+     * @date 17/9/18  下午5:46
+     *
+     */
+    public static void ImgCompress(File source){
+        ImgCompress(source.getName());
+    }
+
+    public static void ImgCompress(String source){
+        try {
+            int prefixIndex = source.lastIndexOf(".");
+            String prefix = source.substring(prefixIndex,source.length());
+            String fileName = source.substring(0,prefixIndex)+thumb_suffix+prefix;
+            Thumbnails.of(source).scale(1).toFile(fileName);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public static void main(String[] args) {
+        ThumbnailatorUtils.ImgCompress("/Volumes/dev/temp/4m.jpg");
+    }
+
+
     /**
      * 指定大小进行缩放
      * 若图片横比width小，高比height小，不变 若图片横比width小，高比height大，高缩小到height，图片比例不变
