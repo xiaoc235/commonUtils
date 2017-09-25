@@ -15,7 +15,6 @@
         <module>zxing</module>
         <module>baseSpringBoot</module>
         <module>thumbnailator</module>
-        <module>../dataAnalysis</module>
     </modules>
 
     <properties>
