@@ -34,6 +34,8 @@ public class CommConstants {
 
     public static final String OPERATOR_FAIL = "操作失败";
 
+    public static final String OPERATOR_OFTEN = "你的操作过于频繁，请稍微再试";
+
     public static final String QUERY_SUCC = "查询成功";
 
     public static final String LOGIN_OUT_MESSAGE = "登录超时";
