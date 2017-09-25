@@ -15,6 +15,7 @@
         <module>zxing</module>
         <module>baseSpringBoot</module>
         <module>thumbnailator</module>
+        <module>../dataAnalysis</module>
     </modules>
 
     <properties>
@@ -31,6 +32,14 @@
             <url>http://dev.1yuanfalv.com/nexus/repository/xc-hosted/</url>
         </repository>
     </distributionManagement>
+
+    <repositories>
+        <repository>
+            <id>nexus-xc</id>
+            <name>nexus-xc</name>
+            <url>http://dev.1yuanfalv.com/nexus/repository/maven-public/</url>
+        </repository>
+    </repositories>
 
     <build>
         <plugins>
