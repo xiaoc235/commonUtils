@@ -45,11 +45,6 @@ public class ThumbnailatorUtils {
     }
 
 
-    public static void main(String[] args) {
-        ThumbnailatorUtils.ImgCompress("/Volumes/dev/temp/4m.jpg");
-    }
-
-
     /**
      * 指定大小进行缩放
      * 若图片横比width小，高比height小，不变 若图片横比width小，高比height大，高缩小到height，图片比例不变
