@@ -2,28 +2,31 @@ package com.common.dao;
 
 import com.common.base.model.MyPageResult;
 import com.common.utils.CommonUtils;
+import com.common.utils.DateFormatUtil;
 import com.common.utils.GsonUtils;
 import com.common.utils.ReflectionUtils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
+import javax.persistence.*;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by jianghaoming on 2017/3/1523:08.
@@ -95,7 +98,7 @@ public abstract class BaseDaoImpl<T>{
      * 查询数据集合，分页
      */
     protected MyPageResult<T> queryListEntityByPage(String sql, Map<String, Object> params, Class clazz, Pageable pageable){
-        MyPageResult<T> pageResult = new MyPageResult<T>();
+        MyPageResult<T> pageResult = new MyPageResult<>();
         if(null == pageable){
             List<T> resultList = this.queryListEntity(sql,params,clazz);
             pageResult.setResultList(resultList);
@@ -109,14 +112,12 @@ public abstract class BaseDaoImpl<T>{
         }
         final int pageSize = pageable.getPageSize();
 
-
         //排序sql拼接 order by
         StringBuffer pageSql = new StringBuffer(sql);
 
         Sort sort = pageable.getSort();
         if(sort!=null) {
             pageSql.append(ORDER_BY_SQL);
-
             for (Sort.Order order : sort) {
                 pageSql.append(CommonUtils.underscoreName(order.getProperty()) + " " + order.getDirection());
             }
@@ -177,6 +178,112 @@ public abstract class BaseDaoImpl<T>{
      */
     protected Integer execute(String sql,Map<String, Object> params){
         return this.query(sql,params).executeUpdate();
+    }
+
+
+    /**
+     * 批量添加
+     * 解决大数据量添加下，hibernate效率问题
+     * @param ts
+     * @return
+     */
+    public List<T> saveList(List<T> ts){
+        List<T> result = new ArrayList<>();
+        final String _insert_sql_str = "insert into ";
+        try {
+
+            StringBuffer sql = new StringBuffer(_insert_sql_str); //运行的sql
+            StringBuffer insertField = new StringBuffer(); //需要保存的字段名
+            StringBuffer insertValue = new StringBuffer(); //插入的value
+            Map<Integer,Object> paraMap = new HashMap<>(); //参数
+            String tableName = ""; //表名
+            int valueIndex = 0;
+            //处理entity
+            for (T entity : ts) {
+                Field fields[] = ReflectionUtils.getDeclaredField(entity);
+                insertValue.append("(");
+                //获取字段列表
+                for (Field fie : fields) {
+                    String fieldName = fie.getName(); //字段名
+                    if (!fieldName.equals("serialVersionUID")) {
+                        if(result.size()==0) {
+                            for (Annotation anno : entity.getClass().getAnnotations()){
+                                if(anno.annotationType().equals(Entity.class)){
+                                    tableName = ((Entity)anno).name();
+                                    if(!CommonUtils.isBlank(tableName)){
+                                        break;
+                                    }
+                                }
+                                if(anno.annotationType().equals(Table.class)){
+                                    tableName = ((Table)anno).name();
+                                    break;
+                                }
+                            }
+                            insertField.append(CommonUtils.underscoreName(fieldName) + ",");
+                        }
+                        Object fieldValue = ReflectionUtils.getFieldValue(entity, fieldName);
+                        //判断自主增加的uuid , createTime, updateTime
+                        if(fie.getAnnotations() !=null && fie.getAnnotations().length>1){
+                            for(Annotation anno : fie.getAnnotations()){
+                                if(anno.annotationType().equals(GenericGenerator.class)){
+                                    fieldValue = UUID.randomUUID().toString();
+                                    break;
+                                }
+                                if(anno.annotationType().equals(CreationTimestamp.class)
+                                        || anno.annotationType().equals(UpdateTimestamp.class) ){
+
+                                    String pattern = DateFormatUtil.YYYY_MM_DD_HH_MM_SS;
+                                    if((fie.getAnnotation(DateTimeFormat.class)) != null){
+                                        pattern = (fie.getAnnotation(DateTimeFormat.class)).pattern();
+                                    }
+
+                                    if(fieldValue != null){
+                                        fieldValue = DateFormatUtil.dateToString((Date) fieldValue,pattern);
+                                    }else {
+                                        fieldValue = DateFormatUtil.getCurrentTime(pattern);
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                        valueIndex++;
+                        paraMap.put(valueIndex,fieldValue);
+                        insertValue.append("?,");
+                    }
+                }
+                insertValue = new StringBuffer(this.substring(insertValue) +"),");
+                result.add(entity);
+
+                //处理大数量 , 分批插入
+                if(result.size() >= 500){
+                    sql.append(tableName);
+                    sql.append("("+this.substring(insertField)+") values");
+                    sql.append(this.substring(insertValue));
+                    this.executeUpdate(sql.toString(),paraMap);
+
+                    result = new ArrayList<>();
+                    sql = new StringBuffer(_insert_sql_str); //运行的sql
+                    insertField = new StringBuffer(); //需要保存的字段名
+                    insertValue = new StringBuffer(); //插入的value
+                    paraMap = new HashMap<>();
+                    valueIndex = 0;
+                }
+            }
+
+
+            if(result.size()>0) {
+                sql.append(tableName);
+                sql.append("(" + this.substring(insertField) + ") values");
+                sql.append(this.substring(insertValue));
+                this.executeUpdate(sql.toString(), paraMap);
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return result;
+
     }
 
 
@@ -247,5 +354,23 @@ public abstract class BaseDaoImpl<T>{
         return jsonObject;
     }
 
+
+
+    private String substring(StringBuffer str){
+        return str.substring(0,str.length()-1);
+    }
+
+    private int executeUpdate(String sql, Map<Integer,Object> paraMap){
+        Query query = entityManager.createNativeQuery(sql);
+        for(Map.Entry<Integer,Object> entry : paraMap.entrySet()){
+            query.setParameter(entry.getKey(),entry.getValue());
+        }
+        int result = query.executeUpdate();
+        //清理缓存
+        entityManager.flush();
+        entityManager.clear();
+        return result;
+
+    }
 }
 
