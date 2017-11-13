@@ -10,16 +10,18 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>baseSpringBoot</artifactId>
-    <version>1.0</version>
+    <version>1.0.1</version>
     <packaging>jar</packaging>
 
 
-    <properties>
-        <spring.version>1.5.4.RELEASE</spring.version>
-    </properties>
-
 
     <dependencies>
+
+        <dependency>
+            <groupId>com.common.server</groupId>
+            <artifactId>baseCommon</artifactId>
+            <version>${common.version}</version>
+        </dependency>
 
         <!-- Spring Boot -->
         <dependency>
@@ -38,17 +40,12 @@
             <version>${spring.version}</version>
         </dependency>
 
+
         <!-- Tomcat -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-tomcat</artifactId>
             <version>${spring.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.common.server</groupId>
-            <artifactId>baseCommon</artifactId>
-            <version>1.0</version>
         </dependency>
 
     </dependencies>

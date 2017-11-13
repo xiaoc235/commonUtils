@@ -15,12 +15,15 @@
         <module>zxing</module>
         <module>baseSpringBoot</module>
         <module>thumbnailator</module>
+        <module>baseJPA</module>
     </modules>
 
     <properties>
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <spring.version>1.5.7.RELEASE</spring.version>
+        <common.version>1.0</common.version>
     </properties>
 
     <!-- jar包上传 -->
@@ -39,6 +42,7 @@
             <url>http://maven.1yuanfalv.com/nexus/repository/maven-public/</url>
         </repository>
     </repositories>
+
 
     <build>
         <plugins>
@@ -59,6 +63,23 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.1</version>
+                <configuration>
+                    <attach>true</attach>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
 
     </build>

@@ -19,7 +19,7 @@
         <dependency>
             <groupId>com.common.server</groupId>
             <artifactId>baseCommon</artifactId>
-            <version>1.0</version>
+            <version>${common.version}</version>
         </dependency>
 
         <dependency>
@@ -27,7 +27,6 @@
             <artifactId>amqp-client</artifactId>
             <version>4.0.0.RC1</version>
         </dependency>
-
     </dependencies>
 
 
