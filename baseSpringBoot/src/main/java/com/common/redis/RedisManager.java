@@ -8,8 +8,6 @@ import redis.clients.jedis.Jedis;
  */
 public class RedisManager {
 
-    public static String type_str = "string";
-    public static String type_obj = "object";
     public static String type_list = "list";
     public static String type_map = "map";
 

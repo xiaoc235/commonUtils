@@ -4,7 +4,8 @@ import com.common.base.exception.BusinessException;
 import com.common.redis.serialize.ListTranscoder;
 import com.common.redis.serialize.MapTranscoder;
 import com.common.redis.serialize.ObjectsTranscoder;
-import org.springframework.beans.factory.annotation.Value;
+import com.common.spring.utils.CommonUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -13,30 +14,19 @@ import redis.clients.jedis.JedisPoolConfig;
 import java.util.List;
 import java.util.Map;
 
-
-@Component("RedisClient")
+@Component
 public class RedisClient {
 
+	private static RedisProperties redisProperties;
 
-	private static String host;
-	
-	private static String port;
-
-	@Value("${redis.host}")
-	public void setHost(String host) {
-		RedisClient.host = host;
-	}
-
-	@Value("${redis.port}")
-	public void setPort(String port) {
-		RedisClient.port = port;
+	@Autowired
+	public void setRedisProperties(RedisProperties redisProperties) {
+		RedisClient.redisProperties = redisProperties;
 	}
 
 	//是否设置有效期标识
 	private int noSetExpFlag = 1;
 
-	public static String type_str = RedisManager.type_str;
-	public static String type_obj = RedisManager.type_obj;
 	public static String type_list = RedisManager.type_list;
 	public static String type_map = RedisManager.type_map;
 
@@ -45,7 +35,11 @@ public class RedisClient {
 	private static JedisPool jedisPool = null;
 
 	private synchronized static void initRedis(){
-		//todo jedis优化配置
+
+		String passwd = redisProperties.getPassword();
+		String host = redisProperties.getHost();
+		String port = redisProperties.getPort();
+
 		JedisPoolConfig config = new JedisPoolConfig();
 		config.setMaxTotal(100);
 		config.setMaxIdle(10);
@@ -61,10 +55,14 @@ public class RedisClient {
 		config.setNumTestsPerEvictionRun(10);
 		//表示一个对象至少停留在idle状态的最短时间，然后才能被idle object evitor扫描并驱逐；这一项只有在timeBetweenEvictionRunsMillis大于0时才有意义
 		config.setMinEvictableIdleTimeMillis(60000);
-		jedisPool = new JedisPool(config,host,Integer.parseInt(port),10000);
+		if(CommonUtils.isBlank(passwd)) {
+			jedisPool = new JedisPool(config, host, Integer.parseInt(port), 10000);
+		}else{
+			jedisPool = new JedisPool(config, host, Integer.parseInt(port), 10000, passwd);
+		}
 	}
 
-	protected synchronized static Jedis getJedis(){
+	protected static Jedis getJedis(){
 		if(null == jedisPool) {
 			initRedis();
 		}
