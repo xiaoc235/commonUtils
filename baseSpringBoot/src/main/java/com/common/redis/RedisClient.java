@@ -14,7 +14,7 @@ import redis.clients.jedis.JedisPoolConfig;
 import java.util.List;
 import java.util.Map;
 
-@Component
+@Component("RedisClient")
 public class RedisClient {
 
 	private static RedisProperties redisProperties;
