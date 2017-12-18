@@ -558,6 +558,9 @@ public class SimpleJpaRepository<T, ID extends Serializable>
                                 if(anno.annotationType().equals(Table.class)){
                                     tableName = ((Table)anno).name();
                                     break;
+                                }else if(anno.annotationType().equals(Entity.class)){
+                                    tableName = ((Entity)anno).name();
+                                    break;
                                 }
                             }
                             insertField.append(CommonUtils.underscoreName(fieldName) + ",");
