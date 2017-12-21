@@ -259,18 +259,7 @@ public class HttpClientUtils {
 
     private static final ContentType xFormUtf8 = ContentType.create(ContentType.APPLICATION_FORM_URLENCODED.getMimeType(),"utf-8");
     public static String post(String url,Map<String,Object> paramMap) throws Exception {
-        String params = "";
-        if(paramMap !=null && paramMap.size() > 0){
-            StringBuffer paramStr = new StringBuffer();
-            for(Map.Entry<String,Object> entry : paramMap.entrySet()){
-                paramStr.append("&"+entry.getKey()+"="+entry.getValue());
-            }
-            params = "?p=p"+paramStr;
-        }
-        HttpEntity entity = new StringEntity(params,xFormUtf8);
-        byte[] bytes = HttpClientUtils.getMethodPostBytes(url,entity,null);
-        String result = new String(bytes);
-        return result;
+       return post(url,paramMap,null,xFormUtf8);
     }
 
 
@@ -279,9 +268,12 @@ public class HttpClientUtils {
         if(paramMap !=null && paramMap.size() > 0){
             StringBuffer paramStr = new StringBuffer();
             for(Map.Entry<String,Object> entry : paramMap.entrySet()){
-                paramStr.append("&"+entry.getKey()+"="+entry.getValue());
+                if(paramStr.length() != 0){
+                    paramStr.append("&");
+                }
+                paramStr.append(entry.getKey() + "=" + entry.getValue());
             }
-            params = "?p=p"+paramStr;
+            params = paramStr.toString();
         }
         HttpEntity entity = new StringEntity(params, contentType);
         byte[] bytes = HttpClientUtils.getMethodPostBytes(url,entity,headerMap);
