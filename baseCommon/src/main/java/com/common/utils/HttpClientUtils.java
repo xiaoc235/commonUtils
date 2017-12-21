@@ -1,6 +1,4 @@
 package com.common.utils;
-
-import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -9,6 +7,8 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 
 import javax.net.ssl.SSLContext;
@@ -114,8 +114,8 @@ public class HttpClientUtils {
     /**
      * Post Entity
      */
-    public static byte[] getMethodPostBytes(String address, HttpEntity paramEntity) throws Exception {
-        return getMethodPostContent(address, paramEntity, getDefaultTimeOutConfig());
+    public static byte[] getMethodPostBytes(String address, HttpEntity paramEntity, Map<String,String> header) throws Exception {
+        return getMethodPostContent(address, paramEntity, getDefaultTimeOutConfig(),header);
     }
 
     /**
@@ -141,19 +141,11 @@ public class HttpClientUtils {
      */
     private static String getMethodPostResponse(String address, HttpEntity paramEntity, RequestConfig config)
                                                                                                              throws Exception {
-        byte[] content = getMethodPostContent(address, paramEntity, config);
+        byte[] content = getMethodPostContent(address, paramEntity, config,null);
         String result = new String(content, "utf-8");
         return result;
 
     }
-    
-    public static String getGjjShebaoPostResponse(String address, HttpEntity paramEntity)
-            throws Exception {
-		byte[] content = getMethodPostContent(address, paramEntity, getDefaultTimeOutConfig());
-		String result = new String(content, "utf-8");
-		return result;
-	
-	}
     
     /**
      * HttpClient get方法请求返回Entity
@@ -168,15 +160,6 @@ public class HttpClientUtils {
                 }
 
             }
-            /*get.addHeader("Cookie"," " +
-                    "wxuin=2296710362; " +
-                    "wxsid=xOd76PZHh52vsfGd; " +
-                    "webwx_data_ticket=BtHaXQ%2F9k4Gts4AUyMwiTvFrNbgFlQn1S9daewl62xr6Fo85QDACpsf%2FnF6Llcny" +
-                    "");*/
-
-            /**
-             * {'webwx_data_ticket': u'BtHaXQ%2F9k4Gts4AUyMwiTvFrNbgFlQn1S9daewl62xr6Fo85QDACpsf%2FnF6Llcny', 'wxsid': u'', 'wxuin': u'2296710362'}
-             */
 
             HttpResponse response = client.execute(get);
             if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
@@ -194,12 +177,18 @@ public class HttpClientUtils {
     /**
      * Post Entity
      */
-    private static byte[] getMethodPostContent(String address, HttpEntity paramEntity, RequestConfig config)
+    private static byte[] getMethodPostContent(String address, HttpEntity paramEntity, RequestConfig config, Map<String,String> header)
                                                                                                             throws Exception {
         HttpPost post = new HttpPost(address);
         try {
             if (paramEntity != null) {
                 post.setEntity(paramEntity);
+            }
+            if(null != header && header.size() > 0) {
+                for(Map.Entry<String,String> entry : header.entrySet()){
+                    post.addHeader(entry.getKey(), entry.getValue());
+                }
+
             }
             post.setConfig(config);
             HttpResponse response = client.execute(post);
@@ -247,4 +236,58 @@ public class HttpClientUtils {
             }
         }
     }
+
+
+
+
+
+
+    public static String get(String url, Map<String,Object> paramMap,Map<String,String> headerMap) throws Exception {
+        if(paramMap !=null && paramMap.size() > 0){
+            StringBuffer paramStr = new StringBuffer();
+            for(Map.Entry<String,Object> entry : paramMap.entrySet()){
+                //_logger.info("url params : "+ entry.getKey()+" = "+ entry.getValue());
+                paramStr.append("&"+entry.getKey()+"="+entry.getValue());
+            }
+            url = url + "?p=p"+paramStr;
+        }
+        //_logger.info("url == > "+ url);
+        byte[] bytes = HttpClientUtils.getMethodGetContent(url,headerMap);
+        String result = new String(bytes);
+        return result;
+    }
+
+    private static final ContentType xFormUtf8 = ContentType.create(ContentType.APPLICATION_FORM_URLENCODED.getMimeType(),"utf-8");
+    public static String post(String url,Map<String,Object> paramMap) throws Exception {
+        String params = "";
+        if(paramMap !=null && paramMap.size() > 0){
+            StringBuffer paramStr = new StringBuffer();
+            for(Map.Entry<String,Object> entry : paramMap.entrySet()){
+                paramStr.append("&"+entry.getKey()+"="+entry.getValue());
+            }
+            params = "?p=p"+paramStr;
+        }
+        HttpEntity entity = new StringEntity(params,xFormUtf8);
+        byte[] bytes = HttpClientUtils.getMethodPostBytes(url,entity,null);
+        String result = new String(bytes);
+        return result;
+    }
+
+
+    public static String post(String url,Map<String,Object> paramMap, Map<String,String> headerMap, ContentType contentType) throws Exception {
+        String params = "";
+        if(paramMap !=null && paramMap.size() > 0){
+            StringBuffer paramStr = new StringBuffer();
+            for(Map.Entry<String,Object> entry : paramMap.entrySet()){
+                paramStr.append("&"+entry.getKey()+"="+entry.getValue());
+            }
+            params = "?p=p"+paramStr;
+        }
+        HttpEntity entity = new StringEntity(params, contentType);
+        byte[] bytes = HttpClientUtils.getMethodPostBytes(url,entity,headerMap);
+        String result = new String(bytes);
+        return result;
+    }
+
+
 }
