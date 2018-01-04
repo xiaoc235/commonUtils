@@ -1,36 +1,24 @@
 package com.common.em;
 
-import java.util.HashMap;
-import java.util.Map;
 
 public enum CommStatusEnum {
-    SUCC(true),
-    FAIL(false);
+    SUCC(0,true),
+    FAIL(1,false),
+    FAIL_MES(2,false);
 
     private boolean value ;
+    private Integer key;
 
-
-    private static Map<Boolean, String> desc = new HashMap<Boolean, String>();
-
-    static {
-        desc.put(SUCC.getValue(),"调用成功");
-        desc.put(FAIL.getValue(),"调用失败");
+    private CommStatusEnum(Integer _key, Boolean _value){
+        key = _key;
+        value = _value;
     }
 
-    private CommStatusEnum(final boolean _value) {
-        this.value = _value;
-    }
-
-    public boolean getValue() {
+    public boolean isValue() {
         return value;
     }
 
-    public static String getDesc(final String key) {
-        if(desc.containsKey(key)){
-            return desc.get(key);
-        }else{
-            return "";
-        }
+    public Integer getKey() {
+        return key;
     }
-
 }
