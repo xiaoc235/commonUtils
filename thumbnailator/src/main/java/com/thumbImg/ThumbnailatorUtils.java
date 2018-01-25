@@ -29,18 +29,20 @@ public class ThumbnailatorUtils {
      * @date 17/9/18  下午5:46
      *
      */
-    public static void ImgCompress(File source){
-        ImgCompress(source.getName());
+    public static String ImgCompress(File source){
+        return ImgCompress(source.getName());
     }
 
-    public static void ImgCompress(String source){
+    public static String ImgCompress(String source){
         try {
             int prefixIndex = source.lastIndexOf(".");
             String prefix = source.substring(prefixIndex,source.length());
             String fileName = source.substring(0,prefixIndex)+thumb_suffix+prefix;
             Thumbnails.of(source).scale(1).toFile(fileName);
+            return fileName;
         } catch (IOException e) {
             e.printStackTrace();
+            return null;
         }
     }
 
@@ -382,6 +384,11 @@ public class ThumbnailatorUtils {
             e.printStackTrace();
         }
         return buf;
+    }
+
+    public static void main(String[] args) {
+       String path =  ImgCompress("/Users/jacky/Documents/cv51_1.png");
+        System.out.println(path);
     }
 
 }

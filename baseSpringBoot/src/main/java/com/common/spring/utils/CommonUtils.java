@@ -4,6 +4,7 @@ import com.common.base.exception.BusinessException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -24,8 +25,9 @@ public class CommonUtils extends com.common.utils.CommonUtils {
      * @param filePath
      * @param fileName
      */
-    public static void saveFile(MultipartFile file , String filePath, String fileName) {
+    public static File saveFile(MultipartFile file , String filePath, String fileName) {
         BufferedOutputStream stream = null;
+        File filet = null;
         try {
             File dir = new File(filePath);
             if (!dir.exists()) {
@@ -34,11 +36,10 @@ public class CommonUtils extends com.common.utils.CommonUtils {
 
 
             byte[] bytes = file.getBytes();
-            File filet = new File(filePath + fileName);
+            filet = new File(filePath + fileName);
             stream = new BufferedOutputStream(new FileOutputStream(filet));
             stream.write(bytes);
-
-
+            return filet;
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -49,6 +50,7 @@ public class CommonUtils extends com.common.utils.CommonUtils {
                     e.printStackTrace();
                 }
             }
+            return filet;
         }
     }
 
@@ -93,5 +95,44 @@ public class CommonUtils extends com.common.utils.CommonUtils {
         return Integer.valueOf(param);
     }
 
+
+
+
+    public static String getIpAddr(HttpServletRequest request) {
+        String ip = request.getHeader("x-forwarded-for");
+        //System.out.println("x-forwarded-for ip: " + ip);
+        if (ip != null && ip.length() != 0 && !"unknown".equalsIgnoreCase(ip)) {
+            // 多次反向代理后会有多个ip值，第一个ip才是真实ip
+            if( ip.indexOf(",")!=-1 ){
+                ip = ip.split(",")[0];
+            }
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("Proxy-Client-IP");
+            //System.out.println("Proxy-Client-IP ip: " + ip);
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("WL-Proxy-Client-IP");
+            //System.out.println("WL-Proxy-Client-IP ip: " + ip);
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("HTTP_CLIENT_IP");
+            //System.out.println("HTTP_CLIENT_IP ip: " + ip);
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("HTTP_X_FORWARDED_FOR");
+            //System.out.println("HTTP_X_FORWARDED_FOR ip: " + ip);
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("X-Real-IP");
+            //System.out.println("X-Real-IP ip: " + ip);
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getRemoteAddr();
+            //System.out.println("getRemoteAddr ip: " + ip);
+        }
+        //System.out.println("获取客户端ip: " + ip);
+        return ip;
+    }
 
 }

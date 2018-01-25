@@ -27,7 +27,7 @@ public class Auth {
     public static Map<String,Object> buildParamMap(Map<String,Object> paramMap)  {
         Map<String,Object> commonMap = new HashMap<>();
         commonMap.put("app_id",appId);
-        commonMap.put("nonce_str", random.nextInt(1000));
+        commonMap.put("nonce_str", random.nextInt(1000000000));
         commonMap.put("time_stamp",(System.currentTimeMillis()/1000));
         if(paramMap!=null && paramMap.size() > 0) {
             for (Map.Entry<String, Object> entry : paramMap.entrySet()) {

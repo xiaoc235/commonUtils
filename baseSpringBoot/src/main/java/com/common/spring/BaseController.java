@@ -136,7 +136,7 @@ public class BaseController {
      * @return
      */
     public ResponseEntity<BaseResponseDto> failResponse(final String message){
-        return failResponse(HttpStatus.OK.value(),message);
+        return failResponse(CommStatusEnum.FAIL.getKey(),message);
     }
     public ResponseEntity<BaseResponseDto> failResponse(final int code, final String message){
         return failResponse(code,message,null);
@@ -149,9 +149,9 @@ public class BaseController {
      */
     public ResponseEntity<BaseResponseDto> failResponse(final int code, final String message, Object obj){
         if(message.contains(CommConstants.LOGIN_OUT_MESSAGE)){
-            return new ResponseEntity<BaseResponseDto>(new BaseResponseDto(CommStatusEnum.FAIL.getValue(),code,message,obj),HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<BaseResponseDto>(new BaseResponseDto(CommStatusEnum.FAIL.isValue(),code,message,obj),HttpStatus.UNAUTHORIZED);
         }
-        return new ResponseEntity<BaseResponseDto>(new BaseResponseDto(CommStatusEnum.FAIL.getValue(),code,message,obj),HttpStatus.OK);
+        return new ResponseEntity<BaseResponseDto>(new BaseResponseDto(CommStatusEnum.FAIL.isValue(),code,message,obj),HttpStatus.OK);
     }
 
 
@@ -161,7 +161,7 @@ public class BaseController {
      * @return
      */
     public ResponseEntity<BaseResponseDto> errorResponse(final int code,final String message){
-        return new ResponseEntity<BaseResponseDto>(new BaseResponseDto(CommStatusEnum.FAIL.getValue(),code,message,null),HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<BaseResponseDto>(new BaseResponseDto(CommStatusEnum.FAIL.isValue(),code,message,null),HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     /**
@@ -170,11 +170,11 @@ public class BaseController {
      * @return
      */
     public ResponseEntity<BaseResponseDto> errorResponse(HttpStatus httpStatus,final String message){
-        return new ResponseEntity<BaseResponseDto>(new BaseResponseDto(CommStatusEnum.FAIL.getValue(),httpStatus.value(),message,null),httpStatus);
+        return new ResponseEntity<BaseResponseDto>(new BaseResponseDto(CommStatusEnum.FAIL.isValue(), HttpStatus.INTERNAL_SERVER_ERROR.value(),message,null),httpStatus);
     }
 
     public ResponseEntity<BaseResponseDto> errorResponse(final String message){
-        return new ResponseEntity<BaseResponseDto>(new BaseResponseDto(CommStatusEnum.FAIL.getValue(),HttpStatus.INTERNAL_SERVER_ERROR.value(),message,null),HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<BaseResponseDto>(new BaseResponseDto(CommStatusEnum.FAIL.isValue(),HttpStatus.INTERNAL_SERVER_ERROR.value(),message,null),HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     /**
@@ -185,6 +185,8 @@ public class BaseController {
     public ResponseEntity<BaseResponseDto> succResponse(final String message){
         return succResponse(message,null, null);
     }
+
+
     /**
      * 返回正确提示，返回data
      * @param message
@@ -193,6 +195,8 @@ public class BaseController {
     public ResponseEntity<BaseResponseDto> succResponse(final String message, Object obj){
         return succResponse(message,obj,null);
     }
+
+
     /**
      * 返回正确提示，返回data & jsonKey
      * @param message
@@ -200,11 +204,11 @@ public class BaseController {
      */
     public ResponseEntity<BaseResponseDto> succResponse(final String message, Object obj, final String jsonKey){
         if(isBlank(jsonKey)){
-            return new ResponseEntity<BaseResponseDto>(new BaseResponseDto(CommStatusEnum.SUCC.getValue(),HttpServletResponse.SC_OK,message,obj),HttpStatus.OK);
+            return new ResponseEntity<BaseResponseDto>(new BaseResponseDto(CommStatusEnum.SUCC.isValue(),CommStatusEnum.SUCC.getKey(),message,obj),HttpStatus.OK);
         }else {
             Map<String, Object> resultMap = new HashMap<String, Object>();
             resultMap.put(jsonKey, obj);
-            return new ResponseEntity<BaseResponseDto>(new BaseResponseDto(CommStatusEnum.SUCC.getValue(),HttpServletResponse.SC_OK, message, resultMap),HttpStatus.OK);
+            return new ResponseEntity<BaseResponseDto>(new BaseResponseDto(CommStatusEnum.SUCC.isValue(),CommStatusEnum.SUCC.getKey(), message, resultMap),HttpStatus.OK);
 
         }
     }

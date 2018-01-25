@@ -7,7 +7,7 @@ public class BusinessException extends Exception {
 
     private static final long serialVersionUID = -4117711143814628555L;
 
-    private int errorCode = 200;
+    private int errorCode = 1;
 
     private String errorDesc ="";
 
@@ -30,11 +30,11 @@ public class BusinessException extends Exception {
     }
 
     public BusinessException(String message) {
-        this(200, message);
+        this(1, message);
     }
 
     public BusinessException(String message, Throwable t) {
-        this(200, message, t);
+        this(1, message, t);
     }
 
     public int getErrorCode() {

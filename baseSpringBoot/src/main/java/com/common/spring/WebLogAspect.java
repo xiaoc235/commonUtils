@@ -1,5 +1,6 @@
 package com.common.spring;
 
+import com.common.spring.utils.CommonUtils;
 import com.common.utils.GsonUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -14,6 +15,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by jianghaoming on 17/5/10.
@@ -54,7 +57,7 @@ public class WebLogAspect {
         requestStr.append(WRAN_LINE_SIGN);
         requestStr.append("--------------------------------------------------------------------------------------------------");
         requestStr.append(WRAN_LINE_SIGN);
-        requestStr.append("IP : " + request.getRemoteAddr());
+        requestStr.append("IP : " + CommonUtils.getIpAddr(request));
         requestStr.append(WRAN_LINE_SIGN);
         requestStr.append("URL : " + request.getRequestURL().toString());
         requestStr.append(WRAN_LINE_SIGN);
@@ -72,6 +75,17 @@ public class WebLogAspect {
             String paraName=(String)enu.nextElement();
             requestStr.append(" "+paraName+" = "+request.getParameter(paraName));
         }
+        requestStr.append(WRAN_LINE_SIGN);
+        Map<String,Object> header = new HashMap<>();
+        Enumeration<String> requestHeader = request.getHeaderNames();
+        while(requestHeader.hasMoreElements()){
+            String key = requestHeader.nextElement();
+            if(key.equals("host") || key.equals("user-agent") || key.equals("userid") || key.equals("userId") || key.contains("token")) {
+                String value = request.getHeader(key);
+                header.put(key, value);
+            }
+        }
+        requestStr.append("Header args : " + header.toString());
         requestStr.append(WRAN_LINE_SIGN);
         requestStr.append("--------------------------------------------------------------------------------------------------");
         _logger.info(requestStr.toString());

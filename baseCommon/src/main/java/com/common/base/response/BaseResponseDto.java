@@ -4,6 +4,8 @@ import com.common.base.BaseDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+
 /**
  * Created by Adam on 2017/4/12 0012.
  */
@@ -21,7 +23,11 @@ public class BaseResponseDto extends BaseDto {
         this.success = success;
         this.code = code;
         this.message = message;
-        this.data = data;
+        if(data != null) {
+            this.data = data;
+        }else{
+            this.data = new HashMap<>();
+        }
     }
 
     public BaseResponseDto() {

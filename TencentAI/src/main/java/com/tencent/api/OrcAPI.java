@@ -21,6 +21,8 @@ import java.util.Map;
  */
 public class OrcAPI extends APIServices{
 
+    private static Logger _logger = LoggerFactory.getLogger(OrcAPI.class);
+
     private static final String apiUrl = ORCUrl.commonORC;
 
     /**
@@ -33,6 +35,7 @@ public class OrcAPI extends APIServices{
         paramMap.put("image",imgBase64Str);
         paramMap = buildParamMap(paramMap);
         String resultJson = HttpClientUtils.post(apiUrl,paramMap);
+        //System.out.println(resultJson);
         BaseTencentResultModel resultModel = GsonUtils.convertObj(resultJson,BaseTencentResultModel.class);
 
         if(resultModel.getRet().equals("0")) {
@@ -40,6 +43,8 @@ public class OrcAPI extends APIServices{
             String objJson = GsonUtils.toJson(obj);
             List<ORCResultModel> result = GsonUtils.convertList(objJson,ORCResultModel.class);
             return result;
+        }else{
+            _logger.info("tencent orc error , msg : {}", resultJson);
         }
         return null;
     }
@@ -51,13 +56,13 @@ public class OrcAPI extends APIServices{
 
 
 
-  /*  public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception {
         InitConfig.init("1106551225","ATJZTWoDgPeEQQdK");
-        String base64Str = Base64Util.getImageStr("/Users/jacky/Documents/cv51_1.png");
+        String base64Str = Base64Util.getImageStr("/Users/jacky/Documents/1111.png");
         //System.out.println(base64Str);
         List<ORCResultModel> list = commonOrc(base64Str);
         for(ORCResultModel item : list){
             System.out.println(item.getItemstring());
         }
-    }*/
+    }
 }

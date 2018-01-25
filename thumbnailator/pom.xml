@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>thumbnailator</artifactId>
+    <artifactId>xcthumbnailator</artifactId>
     <packaging>jar</packaging>
 
 

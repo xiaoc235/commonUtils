@@ -165,9 +165,11 @@ public class CommonUtils {
     }
 
 
-
-
-
+    /**
+     * 枚举类转成list
+     * @param enums
+     * @return
+     */
     public static List<Map<String,Object>> getEmList(Class enums){
         List<Map<String,Object>> list = new ArrayList<>();
         if(!enums.isEnum()){
@@ -189,6 +191,11 @@ public class CommonUtils {
         return list;
     }
 
+    /**
+     * 枚举类转成map
+     * @param enums
+     * @return
+     */
     public static Map<Object,Object> getEmMap(Class enums){
         Map<Object,Object> map = new HashMap<>();
         if(!enums.isEnum()){
@@ -205,6 +212,24 @@ public class CommonUtils {
         }
         return map;
     }
+
+
+    /**
+     * 两个类值相互转换
+     */
+
+    public static Object convertObj(Object obj, Class tClass){
+        if(obj == null){
+            throw new RuntimeException("obj is null!!!");
+        }
+        String objJons = GsonUtils.toJson(obj);
+        Object result = GsonUtils.convertObj(objJons, tClass);
+        return result;
+
+    }
+
+
+
 
 
 
