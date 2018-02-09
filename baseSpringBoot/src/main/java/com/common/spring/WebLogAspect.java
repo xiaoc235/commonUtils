@@ -49,7 +49,8 @@ public class WebLogAspect {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = attributes.getRequest();
 
-        if(request.getDispatcherType().name().equals("ERROR")){
+
+        if(request.getDispatcherType().name().equals("ERROR") || request.getRequestURI().toLowerCase().endsWith("/error")){
             return;
         }
 
