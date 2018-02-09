@@ -49,11 +49,6 @@ public class WebLogAspect {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = attributes.getRequest();
 
-
-        if(request.getDispatcherType().name().equals("ERROR") || request.getRequestURI().toLowerCase().endsWith("/error")){
-            return;
-        }
-
         StringBuffer requestStr = new StringBuffer("request ==> ");
         requestStr.append(WRAN_LINE_SIGN);
         requestStr.append("--------------------------------------------------------------------------------------------------");
@@ -90,6 +85,10 @@ public class WebLogAspect {
         requestStr.append(WRAN_LINE_SIGN);
         requestStr.append("--------------------------------------------------------------------------------------------------");
         _logger.info(requestStr.toString());
+
+        if(request.getDispatcherType().name().equals("ERROR") || request.getRequestURI().toLowerCase().endsWith("/error")){
+            return;
+        }
     }
 
     @AfterReturning(returning = "ret", pointcut = "webLog()")
