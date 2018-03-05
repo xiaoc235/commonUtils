@@ -18,6 +18,7 @@
         <module>baseJPA</module>
         <module>qiniu</module>
         <module>TencentAI</module>
+        <module>wechatPay</module>
     </modules>
 
     <properties>
