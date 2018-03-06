@@ -63,8 +63,6 @@ public class WebLogAspect {
         requestStr.append(WRAN_LINE_SIGN);
         requestStr.append("Class_Method : " + joinPoint.getSignature().getDeclaringTypeName() + "." + joinPoint.getSignature().getName());
         requestStr.append(WRAN_LINE_SIGN);
-        requestStr.append("Body args : " +  GsonUtils.toJson(joinPoint.getArgs()));
-        requestStr.append(WRAN_LINE_SIGN);
         requestStr.append("Url args : ");
         Enumeration<String> enu=request.getParameterNames();
         while(enu.hasMoreElements()){
@@ -82,13 +80,18 @@ public class WebLogAspect {
             }
         }
         requestStr.append("Header args : " + header.toString());
+        if(request.getDispatcherType().name().equals("ERROR") || request.getRequestURI().toLowerCase().endsWith("/error")){
+            _logger.info(requestStr.toString());
+            return;
+        }
         requestStr.append(WRAN_LINE_SIGN);
+        if(joinPoint.getArgs()!=null) {
+            requestStr.append("Body args : " + GsonUtils.toJson(joinPoint.getArgs()));
+        }
         requestStr.append("--------------------------------------------------------------------------------------------------");
         _logger.info(requestStr.toString());
 
-        if(request.getDispatcherType().name().equals("ERROR") || request.getRequestURI().toLowerCase().endsWith("/error")){
-            return;
-        }
+
     }
 
     @AfterReturning(returning = "ret", pointcut = "webLog()")
