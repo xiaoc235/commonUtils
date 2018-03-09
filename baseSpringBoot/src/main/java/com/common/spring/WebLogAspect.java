@@ -29,6 +29,7 @@ public class WebLogAspect {
 
     private static final String WRAN_LINE_SIGN = "\r\n";
 
+    private static final String applicatoin_json = "application/json";
 
     /**
      *
@@ -48,6 +49,10 @@ public class WebLogAspect {
         // 接收到请求，记录请求内容
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = attributes.getRequest();
+
+        if(request.getRequestURI().toLowerCase().endsWith("/error")){
+            return;
+        }
 
         StringBuffer requestStr = new StringBuffer("request ==> ");
         requestStr.append(WRAN_LINE_SIGN);
@@ -80,13 +85,22 @@ public class WebLogAspect {
             }
         }
         requestStr.append("Header args : " + header.toString());
-        if(request.getDispatcherType().name().equals("ERROR") || request.getRequestURI().toLowerCase().endsWith("/error")){
+        if(request.getDispatcherType().name().equals("ERROR")){
             _logger.info(requestStr.toString());
             return;
         }
         requestStr.append(WRAN_LINE_SIGN);
         if(joinPoint.getArgs()!=null) {
-            requestStr.append("Body args : " + GsonUtils.toJson(joinPoint.getArgs()));
+            requestStr.append("Body args : ");
+            if(request.getContentType().equals(applicatoin_json)) {
+                requestStr.append(GsonUtils.toJson(joinPoint.getArgs()));
+            }else{
+                for (int i = 0; i < joinPoint.getArgs().length; i++) {
+                    if(joinPoint.getArgs()[i]!=null) {
+                        requestStr.append(joinPoint.getArgs()[i]);
+                    }
+                }
+            }
             requestStr.append(WRAN_LINE_SIGN);
         }
         requestStr.append("--------------------------------------------------------------------------------------------------");
@@ -97,12 +111,23 @@ public class WebLogAspect {
 
     @AfterReturning(returning = "ret", pointcut = "webLog()")
     public void doAfterReturning(Object ret) throws Throwable {
+        if(CommonUtils.isBlank(ret+"")){
+            return;
+        }
+
         // 处理完请求，返回内容
         StringBuffer reponseStr = new StringBuffer("reponse ==> ");
         reponseStr.append(WRAN_LINE_SIGN);
         reponseStr.append("--------------------------------------------------------------------------------------------------");
         reponseStr.append(WRAN_LINE_SIGN);
-        reponseStr.append(GsonUtils.toJson(ret));
+
+        String typeName = ret.getClass().getTypeName();
+        if(typeName.equals("java.lang.String")){
+            reponseStr.append(ret);
+        }else {
+            reponseStr.append(GsonUtils.toJson(ret));
+        }
+
         reponseStr.append(WRAN_LINE_SIGN);
         reponseStr.append("--------------------------------------------------------------------------------------------------");
         _logger.info(reponseStr.toString());
