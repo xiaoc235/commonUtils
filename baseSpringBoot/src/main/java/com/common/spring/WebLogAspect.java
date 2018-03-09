@@ -92,7 +92,7 @@ public class WebLogAspect {
         requestStr.append(WRAN_LINE_SIGN);
         if(joinPoint.getArgs()!=null) {
             requestStr.append("Body args : ");
-            if(request.getContentType().equals(applicatoin_json)) {
+            if(applicatoin_json.equals(request.getContentType())) {
                 requestStr.append(GsonUtils.toJson(joinPoint.getArgs()));
             }else{
                 for (int i = 0; i < joinPoint.getArgs().length; i++) {
