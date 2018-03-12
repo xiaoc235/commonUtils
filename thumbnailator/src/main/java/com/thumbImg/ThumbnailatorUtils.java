@@ -17,7 +17,7 @@ public class ThumbnailatorUtils {
 
 
 
-    private static String thumb_suffix = "_tub";
+    private static String thumb_suffix = "tub_";
 
 
 
@@ -37,7 +37,7 @@ public class ThumbnailatorUtils {
         try {
             int prefixIndex = source.lastIndexOf(".");
             String prefix = source.substring(prefixIndex,source.length());
-            String fileName = source.substring(0,prefixIndex)+thumb_suffix+prefix;
+            String fileName = thumb_suffix+source.substring(0,prefixIndex)+prefix;
             Thumbnails.of(source).scale(1).toFile(fileName);
             return fileName;
         } catch (IOException e) {
