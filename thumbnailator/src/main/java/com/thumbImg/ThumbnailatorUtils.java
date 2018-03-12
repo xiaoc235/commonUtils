@@ -17,7 +17,7 @@ public class ThumbnailatorUtils {
 
 
 
-    private static String thumb_suffix = "tub_";
+    public static String thumb_suffix = "tub_";
 
 
 
@@ -35,9 +35,9 @@ public class ThumbnailatorUtils {
 
     public static String ImgCompress(String source){
         try {
-            int prefixIndex = source.lastIndexOf(".");
-            String prefix = source.substring(prefixIndex,source.length());
-            String fileName = thumb_suffix+source.substring(0,prefixIndex)+prefix;
+            int prefixIndex = source.lastIndexOf("\\");
+            String prefix = source.substring(prefixIndex+1,source.length());
+            String fileName = source.substring(0,prefixIndex)+"\\"+thumb_suffix+prefix;
             Thumbnails.of(source).scale(1).toFile(fileName);
             return fileName;
         } catch (IOException e) {
@@ -387,7 +387,7 @@ public class ThumbnailatorUtils {
     }
 
     public static void main(String[] args) {
-       String path =  ImgCompress("/Users/jacky/Documents/cv51_1.png");
+       String path =  ImgCompress("D:\\temp\\zexi\\file\\201803\\jhm\\147bc6db-b998-4b0a-b56d-2c49e9b91d81.jpg");
         System.out.println(path);
     }
 
