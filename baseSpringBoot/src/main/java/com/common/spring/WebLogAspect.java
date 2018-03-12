@@ -97,7 +97,7 @@ public class WebLogAspect {
             }else{
                 for (int i = 0; i < joinPoint.getArgs().length; i++) {
                     if(joinPoint.getArgs()[i]!=null) {
-                        requestStr.append(joinPoint.getArgs()[i]);
+                        requestStr.append(joinPoint.getArgs()[i] + "  ");
                     }
                 }
             }
