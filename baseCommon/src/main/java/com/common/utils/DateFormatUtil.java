@@ -155,13 +155,15 @@ public class DateFormatUtil {
         Calendar cal = Calendar.getInstance();
         long timel = cal.getTimeInMillis() - time;
         if (timel / 1000 < 60) {
-            return "1分钟以内";
+            return "刚刚";
         } else if (timel / 1000 / 60 < 60) {
             return timel / 1000 / 60 + "分钟前";
         } else if (timel / 1000 / 60 / 60 < 24) {
             return timel / 1000 / 60 / 60 + "小时前";
-        } else {
+        } else if (timel / 1000 / 60 / 60 / 24 < 7){
             return timel / 1000 / 60 / 60 / 24 + "天前";
+        }else{
+            return dateToString(new Date(time),YYYY_MM_DD);
         }
     }
 
