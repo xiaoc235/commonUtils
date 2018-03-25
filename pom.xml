@@ -19,6 +19,7 @@
         <module>qiniu</module>
         <module>TencentAI</module>
         <module>wechatPay</module>
+        <module>wechatMP</module>
     </modules>
 
     <properties>

@@ -48,6 +48,10 @@ public class WXUtils {
 
     }
 
+    public static boolean isSignatureValid(Map<String, String> data, String key, String sign) throws Exception {
+        return generateSignature(data, key).equals(sign);
+    }
+
     /**
      * 获得随机字符串
      * @return
@@ -166,4 +170,14 @@ public class WXUtils {
         }
         return map;
     }
+
+
+    /**
+     * 获取 timestamp 10位
+     */
+    public static String getTimeStamp(){
+       return System.currentTimeMillis()/1000+"";
+    }
+
+
 }

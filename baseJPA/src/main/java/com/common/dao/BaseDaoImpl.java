@@ -26,6 +26,7 @@ import javax.persistence.*;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.math.BigInteger;
+import java.sql.Timestamp;
 import java.util.*;
 
 /**
@@ -342,12 +343,16 @@ public abstract class BaseDaoImpl<T>{
         JsonObject jsonObject = new JsonObject();
         for(Map.Entry<String,Object> entry : map.entrySet()){
             if(entry.getValue()!=null) {
-                String val = entry.getValue()+"";
                 String key = CommonUtils.camelName(entry.getKey());
-                if(entry.getValue().getClass().getTypeName().equals("java.lang.Integer")){
-                    jsonObject.addProperty(key, Integer.parseInt(val));
-                }else{
-                    jsonObject.addProperty(key, val);
+                String classTypeName = entry.getValue().getClass().getTypeName();
+                if(classTypeName.equals("java.lang.Integer")){
+                    jsonObject.addProperty(key, Integer.parseInt(entry.getValue()+""));
+                }else if(classTypeName.equals("java.sql.Timestamp")){
+                    Timestamp timestamp = (Timestamp) entry.getValue();
+                    jsonObject.addProperty(key,timestamp.getTime());
+                }
+                else{
+                    jsonObject.addProperty(key, entry.getValue()+"");
                 }
             }
         }

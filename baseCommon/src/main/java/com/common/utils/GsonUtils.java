@@ -1,14 +1,12 @@
 package com.common.utils;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -20,7 +18,11 @@ import java.util.List;
  */
 public class GsonUtils {
 	private static Gson gsonByDateFormat;
-    private static final Gson gson = new GsonBuilder().create();
+    private static final Gson gson = new GsonBuilder() .registerTypeAdapter(Date.class, new JsonDeserializer<Date>() {
+        public Date deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+            return DateFormatUtil.string2date(json.getAsJsonPrimitive().getAsString());
+        }
+    }).create();
     private static final Gson anotherGson = new GsonBuilder().disableHtmlEscaping().create();
 
     /**

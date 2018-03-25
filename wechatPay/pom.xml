@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.common.server</groupId>
+    <groupId>com.common.server.wechat</groupId>
     <artifactId>wechatPay</artifactId>
     <version>1.0</version>
 

@@ -8,6 +8,7 @@ import com.xc.wechat.base.Constans;
 import com.xc.wechat.em.PayResultEm;
 import com.xc.wechat.model.order.OrderGenerateRequestModel;
 import com.xc.wechat.model.order.OrderGenerateResponseModel;
+import com.xc.wechat.model.order.OrderPayResponseModel;
 import com.xc.wechat.model.qrcode.QRCodeResultModel;
 import com.xc.wechat.utils.WXUtils;
 import org.apache.http.HttpEntity;
@@ -49,7 +50,28 @@ public class OrderManager {
             _logger.info("下单交易失败:{} - {}",responseModel.getErrCode(), responseModel.getErrCodeDes());
             throw new BusinessException("下单交易失败:"+responseModel.getErrCode()+" - "+ responseModel.getErrCodeDes());
         }
-        _logger.info("下单成功:{}",responseModel.toLogger());
+        _logger.info("下单交易成功:{}",responseModel.toLogger());
         return responseModel;
     }
+
+
+    /**
+     * 支付结果回调
+     */
+    public static OrderPayResponseModel payResult(String xmlResult) throws Exception {
+        Map<String,String> xmlMap = WXUtils.parseXML(xmlResult);
+        OrderPayResponseModel responseModel = GsonUtils.convertObj(GsonUtils.toJson(xmlMap),OrderPayResponseModel.class);
+        if(PayResultEm.FAIL.getValue().equals(responseModel.getReturnCode())){
+            _logger.info("支付接口回调失败:{}",responseModel.getReturnMsg());
+            throw new BusinessException("支付接口回调失败,"+ responseModel.getReturnMsg());
+        }
+        if(PayResultEm.FAIL.getValue().equals(responseModel.getResultCode())){
+            _logger.info("支付交易失败:{} - {}",responseModel.getErrCode(), responseModel.getErrCodeDes());
+            throw new BusinessException("支付交易失败:"+responseModel.getErrCode()+" - "+ responseModel.getErrCodeDes());
+        }
+        _logger.info("支付交易成功:{}",responseModel.toLogger());
+        return responseModel;
+    }
+
+
 }
