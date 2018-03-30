@@ -127,10 +127,13 @@ public class WebLogAspect {
         }else {
             reponseStr.append(GsonUtils.toJson(ret));
         }
-
         reponseStr.append(WRAN_LINE_SIGN);
         reponseStr.append("--------------------------------------------------------------------------------------------------");
-        _logger.info(reponseStr.toString());
+        if(reponseStr.length() > 1000){
+            _logger.info(reponseStr.toString().substring(0,1000)+"......");
+        }else {
+            _logger.info(reponseStr.toString());
+        }
     }
 
 }
