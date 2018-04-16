@@ -118,7 +118,8 @@ public class RedisClient {
 	 */
 	public <T> T get(String key, TypeToken<T> typeToken){
 		Jedis jedis = getJedis();
-		T result = GsonUtils.conver(getString(key), typeToken);
+		String json = getString(key);
+		T result = GsonUtils.conver(json, typeToken);
 		closeJedis(jedis);
 		return result;
 	}
