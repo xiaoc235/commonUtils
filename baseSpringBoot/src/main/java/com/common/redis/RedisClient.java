@@ -74,7 +74,7 @@ public class RedisClient {
 	 * 存入 String
 	 */
 	public void set(String key, String value){
-		this.set(key,value);
+		this.set(key,value,-1);
 	}
 
 	public void set(String key, String value, int seconds){

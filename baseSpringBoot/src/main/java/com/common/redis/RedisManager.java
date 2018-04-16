@@ -1,15 +1,17 @@
 package com.common.redis;
 
 import com.common.spring.ToolSpring;
+import com.google.gson.reflect.TypeToken;
 import redis.clients.jedis.Jedis;
+
+import java.util.List;
 
 /**
  * Created by jianghaoming on 2016/12/29.17:52
  */
 public class RedisManager {
 
-    public static String type_list = "list";
-    public static String type_map = "map";
+    public static TypeToken<List<String>>  listStringTypeToken = new TypeToken<List<String>>(){};
 
     private RedisClient redisClient;
 
