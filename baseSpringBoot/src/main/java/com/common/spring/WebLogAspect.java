@@ -124,13 +124,16 @@ public class WebLogAspect {
         String typeName = ret.getClass().getTypeName();
         if(typeName.equals("java.lang.String")){
             reponseStr.append(ret);
-        }else {
+        }else if(typeName.equals("byte[]")){
+
+        }
+        else {
             reponseStr.append(GsonUtils.toJson(ret));
         }
         reponseStr.append(WRAN_LINE_SIGN);
         reponseStr.append("--------------------------------------------------------------------------------------------------");
-        if(reponseStr.length() > 1000){
-            _logger.info(reponseStr.toString().substring(0,1000)+"......");
+        if(reponseStr.toString().length() > 800){
+            _logger.info(reponseStr.toString().substring(0,790)+"......");
         }else {
             _logger.info(reponseStr.toString());
         }
