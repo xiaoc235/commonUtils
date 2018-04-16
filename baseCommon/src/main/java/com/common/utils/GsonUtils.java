@@ -18,7 +18,7 @@ import java.util.List;
  */
 public class GsonUtils {
 	private static Gson gsonByDateFormat;
-    private static final Gson gson = new GsonBuilder() .registerTypeAdapter(Date.class, new JsonDeserializer<Date>() {
+    public static final Gson gson = new GsonBuilder() .registerTypeAdapter(Date.class, new JsonDeserializer<Date>() {
         public Date deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             return DateFormatUtil.string2date(json.getAsJsonPrimitive().getAsString());
         }
@@ -128,6 +128,11 @@ public class GsonUtils {
         }
         return gson.fromJson(json, cls);
     }
+
+    public static <T> T conver(String json, TypeToken<T> typeToken){
+        return gson.fromJson(json,typeToken.getType());
+    }
+
 
     /**
      * <pre>
