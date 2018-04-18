@@ -132,8 +132,8 @@ public class WebLogAspect {
         }
         reponseStr.append(WRAN_LINE_SIGN);
         reponseStr.append("--------------------------------------------------------------------------------------------------");
-        if(reponseStr.toString().length() > 800){
-            _logger.info(reponseStr.toString().substring(0,790)+"......");
+        if(reponseStr.toString().length() > 2000){
+            _logger.info(reponseStr.toString().substring(0,1900)+"......");
         }else {
             _logger.info(reponseStr.toString());
         }
