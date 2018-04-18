@@ -28,14 +28,12 @@ public class RedisClient {
 	private static JedisPool jedisPool = null;
 
 	private synchronized static void initRedis(){
-
 		String passwd = redisProperties.getPassword();
 		String host = redisProperties.getHost();
 		String port = redisProperties.getPort();
-
 		JedisPoolConfig config = new JedisPoolConfig();
-		config.setMaxTotal(100);
-		config.setMaxIdle(10);
+		config.setMaxTotal(500);
+		config.setMaxIdle(100);
 		config.setMinIdle(5);//设置最小空闲数
 		config.setMaxWaitMillis(10000);
 		config.setTestOnBorrow(true);
@@ -95,7 +93,14 @@ public class RedisClient {
 	    this.set(key,t,-1);
 	}
 	public <T> void set(String key, T t, int seconds){
-        this.set(key,GsonUtils.toJson(t),seconds);
+	    try {
+            String json = GsonUtils.toJson(t);
+            this.set(key,json,seconds);
+        }catch (Exception e){
+	        //不能json转换，直接强转为string
+            this.set(key, t + "", seconds);
+        }
+
     }
 
 
