@@ -103,13 +103,12 @@ public class RedisClient {
 
     }
 
-
 	/**
 	 * 读取 String
 	 * @param key
 	 * @return String
 	 */
-	public String getString(String key){
+	public String get(String key){
 		Jedis jedis = getJedis();
 		String value = jedis.get(key);
 		closeJedis(jedis);
@@ -123,7 +122,7 @@ public class RedisClient {
 	 */
 	public <T> T get(String key, TypeToken<T> typeToken){
 		Jedis jedis = getJedis();
-		String json = getString(key);
+		String json = get(key);
 		T result = GsonUtils.conver(json, typeToken);
 		closeJedis(jedis);
 		return result;
