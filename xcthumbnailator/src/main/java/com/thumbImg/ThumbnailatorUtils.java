@@ -30,20 +30,19 @@ public class ThumbnailatorUtils {
      *
      */
     public static String ImgCompress(File source){
-        return ImgCompress(source.getName());
+        String fileName = thumb_suffix+source.getName();
+        String path = source.getParent() + File.separator + fileName;
+        try {
+            Thumbnails.of(source).scale(1).toFile(path);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return path;
     }
 
     public static String ImgCompress(String source){
-        try {
-            int prefixIndex = source.lastIndexOf("\\");
-            String prefix = source.substring(prefixIndex+1,source.length());
-            String fileName = source.substring(0,prefixIndex)+"\\"+thumb_suffix+prefix;
-            Thumbnails.of(source).scale(1).toFile(fileName);
-            return fileName;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
+            File file = new File(source);
+            return ImgCompress(file);
     }
 
 
@@ -386,9 +385,9 @@ public class ThumbnailatorUtils {
         return buf;
     }
 
-    public static void main(String[] args) {
-       String path =  ImgCompress("D:\\temp\\zexi\\file\\201803\\jhm\\147bc6db-b998-4b0a-b56d-2c49e9b91d81.jpg");
+  /*  public static void main(String[] args) {
+        String path =  ImgCompress("D:\\temp\\zexi\\file\\test\\3.jpg");
         System.out.println(path);
-    }
+    }*/
 
 }
