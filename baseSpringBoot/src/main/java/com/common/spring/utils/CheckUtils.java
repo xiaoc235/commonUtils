@@ -10,7 +10,9 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class CheckUtils {
 
-
+    private CheckUtils(){
+        super();
+    }
 
     /**
      * @Title: 校验参数为空
@@ -20,7 +22,7 @@ public class CheckUtils {
     public static void checkParamNull(final String param, final String message) throws BusinessException {
         if(StringUtils.isBlank(param)){
             throw new BusinessException(message);
-        }else if("null".equals(param.toLowerCase())){
+        }else if("null".equalsIgnoreCase(param)){
             throw new BusinessException(message);
         }
     }
@@ -28,7 +30,7 @@ public class CheckUtils {
     public static void checkParamNullWithRetCode(final String param, final String message) throws BusinessException {
         if(StringUtils.isBlank(param)){
             throw new BusinessException(HttpServletResponse.SC_BAD_REQUEST, message);
-        }else if("null".equals(param.toLowerCase())){
+        }else if("null".equalsIgnoreCase(param)){
             throw new BusinessException(HttpServletResponse.SC_BAD_REQUEST, message);
         }
     }

@@ -10,10 +10,7 @@ import com.common.spring.utils.CheckUtils;
 import com.common.spring.utils.CommonUtils;
 import com.common.utils.EmojiUtil;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -26,9 +23,6 @@ import java.util.Map;
  * Created by jianghaoming on 17/2/26.
  */
 public class BaseController {
-
-
-    private static final Logger _baseControllerLogger = LoggerFactory.getLogger(BaseController.class);
 
     @Autowired
     protected HttpServletRequest request;
@@ -101,7 +95,6 @@ public class BaseController {
         } catch (BusinessException e) {
             e.printStackTrace();
         }
-        _baseControllerLogger.info(key+" = ["+value+"]");
         return value.trim();
     }
 
@@ -113,7 +106,6 @@ public class BaseController {
     protected String getMapParamAndCheckNull(final String key, Map<String,Object> paramMap) throws BusinessException {
         final String param = getMapParam(key,paramMap);
         checkParamNull(param,key+"不能为空");
-        _baseControllerLogger.info(key+" = ["+param+"]");
         return param;
     }
 
@@ -124,7 +116,6 @@ public class BaseController {
      */
     protected Integer getMapParamIntAndCheckNull(final String key, Map<String,Object> paramMap) throws BusinessException {
         final String param = getMapParamAndCheckNull(key,paramMap);
-        _baseControllerLogger.info(key+" = ["+param+"]");
         return Integer.valueOf(param);
     }
 
@@ -149,9 +140,9 @@ public class BaseController {
      */
     public ResponseEntity<BaseResponseDto> failResponse(final int code, final String message, Object obj){
         if(message.contains(CommConstants.LOGIN_OUT_MESSAGE)){
-            return new ResponseEntity<BaseResponseDto>(new BaseResponseDto(CommStatusEnum.FAIL.isValue(),code,message,obj),HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(new BaseResponseDto(CommStatusEnum.FAIL.isValue(),code,message,obj),HttpStatus.UNAUTHORIZED);
         }
-        return new ResponseEntity<BaseResponseDto>(new BaseResponseDto(CommStatusEnum.FAIL.isValue(),code,message,obj),HttpStatus.OK);
+        return new ResponseEntity<>(new BaseResponseDto(CommStatusEnum.FAIL.isValue(),code,message,obj),HttpStatus.OK);
     }
 
 
@@ -161,7 +152,7 @@ public class BaseController {
      * @return
      */
     public ResponseEntity<BaseResponseDto> errorResponse(final int code,final String message){
-        return new ResponseEntity<BaseResponseDto>(new BaseResponseDto(CommStatusEnum.FAIL.isValue(),code,message,null),HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(new BaseResponseDto(CommStatusEnum.FAIL.isValue(),code,message,null),HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     /**
@@ -170,11 +161,11 @@ public class BaseController {
      * @return
      */
     public ResponseEntity<BaseResponseDto> errorResponse(HttpStatus httpStatus,final String message){
-        return new ResponseEntity<BaseResponseDto>(new BaseResponseDto(CommStatusEnum.FAIL.isValue(), HttpStatus.INTERNAL_SERVER_ERROR.value(),message,null),httpStatus);
+        return new ResponseEntity<>(new BaseResponseDto(CommStatusEnum.FAIL.isValue(), HttpStatus.INTERNAL_SERVER_ERROR.value(),message,null),httpStatus);
     }
 
     public ResponseEntity<BaseResponseDto> errorResponse(final String message){
-        return new ResponseEntity<BaseResponseDto>(new BaseResponseDto(CommStatusEnum.FAIL.isValue(),HttpStatus.INTERNAL_SERVER_ERROR.value(),message,null),HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(new BaseResponseDto(CommStatusEnum.FAIL.isValue(),HttpStatus.INTERNAL_SERVER_ERROR.value(),message,null),HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     /**
@@ -204,11 +195,11 @@ public class BaseController {
      */
     public ResponseEntity<BaseResponseDto> succResponse(final String message, Object obj, final String jsonKey){
         if(isBlank(jsonKey)){
-            return new ResponseEntity<BaseResponseDto>(new BaseResponseDto(CommStatusEnum.SUCC.isValue(),CommStatusEnum.SUCC.getKey(),message,obj),HttpStatus.OK);
+            return new ResponseEntity<>(new BaseResponseDto(CommStatusEnum.SUCC.isValue(),CommStatusEnum.SUCC.getKey(),message,obj),HttpStatus.OK);
         }else {
-            Map<String, Object> resultMap = new HashMap<String, Object>();
+            Map<String, Object> resultMap = new HashMap<>();
             resultMap.put(jsonKey, obj);
-            return new ResponseEntity<BaseResponseDto>(new BaseResponseDto(CommStatusEnum.SUCC.isValue(),CommStatusEnum.SUCC.getKey(), message, resultMap),HttpStatus.OK);
+            return new ResponseEntity<>(new BaseResponseDto(CommStatusEnum.SUCC.isValue(),CommStatusEnum.SUCC.getKey(), message, resultMap),HttpStatus.OK);
 
         }
     }

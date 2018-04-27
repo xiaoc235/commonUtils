@@ -10,8 +10,6 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 @Component("RedisClient")
@@ -27,7 +25,7 @@ public class RedisClient {
     //连接池
 	private static JedisPool jedisPool = null;
 
-	private synchronized static void initRedis(){
+	private static synchronized void initRedis(){
 		String passwd = redisProperties.getPassword();
 		String host = redisProperties.getHost();
 		String port = redisProperties.getPort();

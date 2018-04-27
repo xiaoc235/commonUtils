@@ -537,9 +537,9 @@ public class SimpleJpaRepository<T, ID extends Serializable>
 
         try {
 
-            StringBuffer sql = new StringBuffer(_insert_sql_str); //运行的sql
-            StringBuffer insertField = new StringBuffer(); //需要保存的字段名
-            StringBuffer insertValue = new StringBuffer(); //插入的value
+            StringBuilder sql = new StringBuilder(_insert_sql_str); //运行的sql
+            StringBuilder insertField = new StringBuilder(); //需要保存的字段名
+            StringBuilder insertValue = new StringBuilder(); //插入的value
             Map<Integer,Object> paraMap = new HashMap<>(); //参数
             String tableName = ""; //表名
             int valueIndex = 0;
@@ -601,7 +601,7 @@ public class SimpleJpaRepository<T, ID extends Serializable>
                         insertValue.append("?,");
                     }
                 }
-                insertValue = new StringBuffer(this.substring(insertValue) +"),");
+                insertValue = new StringBuilder(this.substring(insertValue) +"),");
 
                 result.add(entity);
 
@@ -613,9 +613,9 @@ public class SimpleJpaRepository<T, ID extends Serializable>
                     this.executeUpdate(sql.toString(),paraMap);
 
                     result = new ArrayList<S>();
-                    sql = new StringBuffer(_insert_sql_str); //运行的sql
-                    insertField = new StringBuffer(); //需要保存的字段名
-                    insertValue = new StringBuffer(); //插入的value
+                    sql = new StringBuilder(_insert_sql_str); //运行的sql
+                    insertField = new StringBuilder(); //需要保存的字段名
+                    insertValue = new StringBuilder(); //插入的value
                     paraMap = new HashMap<>();
                     valueIndex = 0;
                 }
@@ -636,7 +636,7 @@ public class SimpleJpaRepository<T, ID extends Serializable>
     }
 
 
-    private String substring(StringBuffer str){
+    private String substring(StringBuilder str){
         return str.substring(0,str.length()-1);
     }
 

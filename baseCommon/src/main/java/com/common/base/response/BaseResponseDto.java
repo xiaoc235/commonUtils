@@ -11,8 +11,6 @@ import java.util.HashMap;
  */
 public class BaseResponseDto extends BaseDto {
 
-    private static final Logger _logger = LoggerFactory.getLogger(BaseResponseDto.class);
-
     private Boolean success;
     private int code; //对应HttpServletResponse中的状态码
     private String message;

@@ -58,11 +58,11 @@ public abstract class BaseDaoImpl<T>{
      */
     protected List<T> queryListEntity(String sql, Map<String, Object> params, Class<T> clazz){
         //转换 --> map 转 json ,  json to List.Object
-        List<T> resultList = new ArrayList();
+        List<T> resultList = null;
         try {
             resultList = this.queryList(sql,params);
-            if( resultList == null){
-                return null;
+            if(resultList.isEmpty()){
+                return new ArrayList<>();
             }
             JsonArray jsonList = new JsonArray();
             for(T t : resultList){
@@ -72,7 +72,7 @@ public abstract class BaseDaoImpl<T>{
             }
             resultList = GsonUtils.convertList(jsonList.toString(), clazz);
         }catch (Exception e){
-            e.printStackTrace();
+            _logger.error(e.getMessage(),e);
             resultList = new ArrayList();
         }
         return resultList;
@@ -85,7 +85,7 @@ public abstract class BaseDaoImpl<T>{
      */
     protected T queryEntity(String sql, Map<String, Object> params, Class<T> clazz){
        List<Map<String,Object>> resultList = (List<Map<String,Object>>) this.queryList(sql,params);
-       if(resultList!=null && resultList.size()>0){
+       if(resultList.isEmpty()){
            return GsonUtils.convertObj(convertJsonObject(resultList.get(0)).toString(),clazz);
        }else{
            return null;
@@ -114,8 +114,7 @@ public abstract class BaseDaoImpl<T>{
         final int pageSize = pageable.getPageSize();
 
         //排序sql拼接 order by
-        StringBuffer pageSql = new StringBuffer(sql);
-
+        StringBuilder pageSql = new StringBuilder(sql);
         Sort sort = pageable.getSort();
         if(sort!=null) {
             pageSql.append(ORDER_BY_SQL);
@@ -165,7 +164,7 @@ public abstract class BaseDaoImpl<T>{
      */
     protected Map<String,Object> getSingleResult(String sql,Map<String, Object> params){
         List<T> list = this.queryList(sql,params);
-        if(list!=null && list.size()>0){
+        if(list.isEmpty()){
             return (Map<String, Object>) list.get(0);
         }
         return null;
@@ -193,9 +192,9 @@ public abstract class BaseDaoImpl<T>{
         final String _insert_sql_str = "insert into ";
         try {
 
-            StringBuffer sql = new StringBuffer(_insert_sql_str); //运行的sql
-            StringBuffer insertField = new StringBuffer(); //需要保存的字段名
-            StringBuffer insertValue = new StringBuffer(); //插入的value
+            StringBuilder sql = new StringBuilder(_insert_sql_str); //运行的sql
+            StringBuilder insertField = new StringBuilder(); //需要保存的字段名
+            StringBuilder insertValue = new StringBuilder(); //插入的value
             Map<Integer,Object> paraMap = new HashMap<>(); //参数
             String tableName = ""; //表名
             int valueIndex = 0;
@@ -207,7 +206,7 @@ public abstract class BaseDaoImpl<T>{
                 for (Field fie : fields) {
                     String fieldName = fie.getName(); //字段名
                     if (!fieldName.equals("serialVersionUID")) {
-                        if(result.size()==0) {
+                        if(result.isEmpty()) {
                             for (Annotation anno : entity.getClass().getAnnotations()){
                                 if(anno.annotationType().equals(Entity.class)){
                                     tableName = ((Entity)anno).name();
@@ -252,7 +251,7 @@ public abstract class BaseDaoImpl<T>{
                         insertValue.append("?,");
                     }
                 }
-                insertValue = new StringBuffer(this.substring(insertValue) +"),");
+                insertValue = new StringBuilder(this.substring(insertValue) +"),");
                 result.add(entity);
 
                 //处理大数量 , 分批插入
@@ -263,16 +262,16 @@ public abstract class BaseDaoImpl<T>{
                     this.executeUpdate(sql.toString(),paraMap);
 
                     result = new ArrayList<>();
-                    sql = new StringBuffer(_insert_sql_str); //运行的sql
-                    insertField = new StringBuffer(); //需要保存的字段名
-                    insertValue = new StringBuffer(); //插入的value
+                    sql = new StringBuilder(_insert_sql_str); //运行的sql
+                    insertField = new StringBuilder(); //需要保存的字段名
+                    insertValue = new StringBuilder(); //插入的value
                     paraMap = new HashMap<>();
                     valueIndex = 0;
                 }
             }
 
 
-            if(result.size()>0) {
+            if(result.isEmpty()) {
                 sql.append(tableName);
                 sql.append("(" + this.substring(insertField) + ") values");
                 sql.append(this.substring(insertValue));
@@ -280,7 +279,7 @@ public abstract class BaseDaoImpl<T>{
             }
 
         }catch (Exception e){
-            e.printStackTrace();
+            _logger.error(e.getMessage(),e);
         }
 
         return result;
@@ -295,14 +294,15 @@ public abstract class BaseDaoImpl<T>{
 
     private Query query(final String sql,  Map<String, Object> params){
         Query query =  entityManager.createNativeQuery(sql);
-        _logger.info("sql : "+ sql);
+        _logger.info("sql :{} ", sql);
         if (params != null) {
-            StringBuffer paramStr = new StringBuffer();
-            for (String key : params.keySet()) {
-                paramStr.append(key+"="+params.get(key)+" ");
-                query.setParameter(key, params.get(key));
+            StringBuilder paramStr = new StringBuilder();
+
+            for(Map.Entry<String,Object> entry : params.entrySet()){
+                paramStr.append(entry.getKey()+"="+entry.getValue()+" ");
+                query.setParameter(entry.getKey(), entry.getValue());
             }
-            _logger.info("params ["+paramStr.toString()+"]");
+            _logger.info("params [{}]",paramStr);
         }
         return query;
     }
@@ -311,14 +311,14 @@ public abstract class BaseDaoImpl<T>{
         Session session = entityManager.unwrap(Session.class);
         SQLQuery query = session.createSQLQuery(sql);
         query.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
-        _logger.info("sql : "+ sql);
+        _logger.info("sql :{} ", sql);
         if (params != null) {
-            StringBuffer paramStr = new StringBuffer();
-            for (String key : params.keySet()) {
-                paramStr.append(key+"="+params.get(key)+" ");
-                query.setParameter(key, params.get(key));
+            StringBuilder paramStr = new StringBuilder();
+            for(Map.Entry<String,Object> entry : params.entrySet()){
+                paramStr.append(entry.getKey()+"="+ entry.getValue()+" ");
+                query.setParameter(entry.getKey(), entry.getValue());
             }
-            _logger.info("params ["+paramStr.toString()+"]");
+            _logger.info("params :{}",paramStr);
         }
         return query;
     }
@@ -327,7 +327,7 @@ public abstract class BaseDaoImpl<T>{
     private List<T> queryList(String sql, Map<String, Object> params){
         List<T> resultList = this.getSqlQuery(sql,params).list();
         if(resultList == null){
-            resultList = new ArrayList<T>();
+            resultList = new ArrayList<>();
         }
         return resultList;
     }
@@ -361,7 +361,7 @@ public abstract class BaseDaoImpl<T>{
 
 
 
-    private String substring(StringBuffer str){
+    private String substring(StringBuilder str){
         return str.substring(0,str.length()-1);
     }
 
