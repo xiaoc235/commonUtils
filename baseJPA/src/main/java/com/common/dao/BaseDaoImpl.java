@@ -85,7 +85,7 @@ public abstract class BaseDaoImpl<T>{
      */
     protected T queryEntity(String sql, Map<String, Object> params, Class<T> clazz){
        List<Map<String,Object>> resultList = (List<Map<String,Object>>) this.queryList(sql,params);
-       if(resultList.isEmpty()){
+       if(!resultList.isEmpty()){
            return GsonUtils.convertObj(convertJsonObject(resultList.get(0)).toString(),clazz);
        }else{
            return null;
@@ -164,7 +164,7 @@ public abstract class BaseDaoImpl<T>{
      */
     protected Map<String,Object> getSingleResult(String sql,Map<String, Object> params){
         List<T> list = this.queryList(sql,params);
-        if(list.isEmpty()){
+        if(!list.isEmpty()){
             return (Map<String, Object>) list.get(0);
         }
         return null;
