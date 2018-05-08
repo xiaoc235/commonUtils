@@ -1,30 +1,24 @@
 package com.common.base.response;
 
 import com.common.base.BaseDto;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 
-/**
- * Created by Adam on 2017/4/12 0012.
- */
-public class BaseResponseDto extends BaseDto {
+
+public class BaseResponseDto<T> extends BaseDto {
 
     private Boolean success;
     private int code; //对应HttpServletResponse中的状态码
     private String message;
-    private Object data;
+    private T data;
 
-    public BaseResponseDto(final Boolean success,final int code, final String message, final Object data) {
+    public BaseResponseDto( Boolean success , int code, String message, T data) {
         super();
         this.success = success;
         this.code = code;
         this.message = message;
         if(data != null) {
             this.data = data;
-        }else{
-            this.data = new HashMap<>();
         }
     }
 
@@ -48,11 +42,11 @@ public class BaseResponseDto extends BaseDto {
         this.message = message;
     }
 
-    public Object getData() {
+    public T getData() {
         return data;
     }
 
-    public void setData(Object data) {
+    public void setData(T data) {
         this.data = data;
     }
 

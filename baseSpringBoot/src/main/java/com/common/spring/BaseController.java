@@ -10,6 +10,8 @@ import com.common.spring.utils.CheckUtils;
 import com.common.spring.utils.CommonUtils;
 import com.common.utils.EmojiUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +26,8 @@ import java.util.Map;
  */
 public class BaseController {
 
+    private static final Logger _logger = LoggerFactory.getLogger(BaseController.class);
+
     @Autowired
     protected HttpServletRequest request;
 
@@ -32,6 +36,8 @@ public class BaseController {
 
     @Autowired
     protected RedisClient redis;
+
+    private static final Map<String,String> nullMap = new HashMap<>();
 
     protected boolean isBlank(final String param){
         return CommonUtils.isBlank(param);
@@ -139,6 +145,9 @@ public class BaseController {
      * @return
      */
     public ResponseEntity<BaseResponseDto> failResponse(final int code, final String message, Object obj){
+        if(obj == null){
+            obj = nullMap;
+        }
         if(message.contains(CommConstants.LOGIN_OUT_MESSAGE)){
             return new ResponseEntity<>(new BaseResponseDto(CommStatusEnum.FAIL.isValue(),code,message,obj),HttpStatus.UNAUTHORIZED);
         }
@@ -152,7 +161,7 @@ public class BaseController {
      * @return
      */
     public ResponseEntity<BaseResponseDto> errorResponse(final int code,final String message){
-        return new ResponseEntity<>(new BaseResponseDto(CommStatusEnum.FAIL.isValue(),code,message,null),HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(new BaseResponseDto(CommStatusEnum.FAIL.isValue(),code,message,nullMap),HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     /**
@@ -161,11 +170,11 @@ public class BaseController {
      * @return
      */
     public ResponseEntity<BaseResponseDto> errorResponse(HttpStatus httpStatus,final String message){
-        return new ResponseEntity<>(new BaseResponseDto(CommStatusEnum.FAIL.isValue(), HttpStatus.INTERNAL_SERVER_ERROR.value(),message,null),httpStatus);
+        return new ResponseEntity<>(new BaseResponseDto(CommStatusEnum.FAIL.isValue(), HttpStatus.INTERNAL_SERVER_ERROR.value(),message,nullMap),httpStatus);
     }
 
     public ResponseEntity<BaseResponseDto> errorResponse(final String message){
-        return new ResponseEntity<>(new BaseResponseDto(CommStatusEnum.FAIL.isValue(),HttpStatus.INTERNAL_SERVER_ERROR.value(),message,null),HttpStatus.INTERNAL_SERVER_ERROR);
+        return errorResponse(HttpStatus.INTERNAL_SERVER_ERROR, message);
     }
 
     /**
@@ -194,8 +203,11 @@ public class BaseController {
      * @return
      */
     public ResponseEntity<BaseResponseDto> succResponse(final String message, Object obj, final String jsonKey){
+        if(obj == null){
+            obj = nullMap;
+        }
         if(isBlank(jsonKey)){
-            return new ResponseEntity<>(new BaseResponseDto(CommStatusEnum.SUCC.isValue(),CommStatusEnum.SUCC.getKey(),message,obj),HttpStatus.OK);
+            return new ResponseEntity<>(new BaseResponseDto(CommStatusEnum.SUCC.isValue(), CommStatusEnum.SUCC.getKey(), message, obj), HttpStatus.OK);
         }else {
             Map<String, Object> resultMap = new HashMap<>();
             resultMap.put(jsonKey, obj);
@@ -204,5 +216,23 @@ public class BaseController {
         }
     }
 
+    @FunctionalInterface
+    public interface Method{
+        ResponseEntity<BaseResponseDto> call() throws BusinessException, Exception;
+    }
+
+    public ResponseEntity<BaseResponseDto> calls(Method method){
+        try {
+            return method.call();
+        }catch (BusinessException ex) {
+            final String message = ex.getErrorDesc();
+            _logger.info(CommConstants.BUSINESS_ERROR + message,ex);
+            return failResponse(ex.getErrorCode(),message);
+        }catch (Exception e) {
+            final String message = CommConstants.SYSTEM_ERROR;
+            _logger.error(message, e);
+            return errorResponse(message);
+        }
+    }
 
 }
