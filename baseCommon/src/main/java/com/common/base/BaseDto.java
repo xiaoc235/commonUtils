@@ -50,6 +50,10 @@ public class BaseDto implements Serializable {
         return loggerResult.toString();
     }
 
+    @Override
+    public String toString() {
+        return this.toLogger();
+    }
 
     /**
      * @Title: 验证属性是否为空

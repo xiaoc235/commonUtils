@@ -43,6 +43,26 @@ public class BaseController {
         return CommonUtils.isBlank(param);
     }
 
+    protected int getPageNumber(){
+        int page = 0;
+        String pageStr = getRequestParam("page");
+        if(!isBlank(pageStr)){
+            page = Integer.parseInt(pageStr);
+        }
+        if(page > 30){
+            page = 30;
+        }
+        return page;
+    }
+
+    protected int getPageSize(){
+        int size = 10;
+        String sizeStr = getRequestParam("size");
+        if(!isBlank(sizeStr)){
+            size = Integer.parseInt(sizeStr);
+        }
+        return size;
+    }
 
     /**
      * @Title: 校验参数为空

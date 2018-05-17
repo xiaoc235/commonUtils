@@ -21,5 +21,20 @@ public enum CommResultEnum {
         return Integer.parseInt(value);
     }
 
+    public static boolean getBoolean(int _value){
+        if(_value == YES.getIntValue()){
+            return true;
+        }
+        return false;
+    }
+
+    public static int getInt(boolean flag){
+        if(flag){
+            return YES.getIntValue();
+        }else{
+            return NO.getIntValue();
+        }
+    }
+
 
 }
