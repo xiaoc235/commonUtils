@@ -20,6 +20,7 @@
         <module>TencentAI</module>
         <module>wechatPay</module>
         <module>wechatMP</module>
+        <module>workFilter</module>
     </modules>
 
     <properties>
