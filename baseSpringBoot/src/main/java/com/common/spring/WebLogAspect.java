@@ -29,7 +29,7 @@ public class WebLogAspect {
 
     private static final String WRAN_LINE_SIGN = "\r\n";
 
-    private static final String applicatoin_json = "application/json";
+    private static final String application_json = "application/json";
 
     /**
      *
@@ -92,7 +92,7 @@ public class WebLogAspect {
         requestStr.append(WRAN_LINE_SIGN);
         if(joinPoint.getArgs()!=null) {
             requestStr.append("Body args : ");
-            if(request.getContentType() !=null && request.getContentType().contains(applicatoin_json)) {
+            if(request.getContentType() !=null && request.getContentType().contains(application_json)) {
                 requestStr.append(GsonUtils.toJson(joinPoint.getArgs()));
             }else{
                 for (int i = 0; i < joinPoint.getArgs().length; i++) {
@@ -116,26 +116,26 @@ public class WebLogAspect {
         }
 
         // 处理完请求，返回内容
-        StringBuffer reponseStr = new StringBuffer("reponse ==> ");
-        reponseStr.append(WRAN_LINE_SIGN);
-        reponseStr.append("--------------------------------------------------------------------------------------------------");
-        reponseStr.append(WRAN_LINE_SIGN);
+        StringBuffer responseStr = new StringBuffer("response ==> ");
+        responseStr.append(WRAN_LINE_SIGN);
+        responseStr.append("--------------------------------------------------------------------------------------------------");
+        responseStr.append(WRAN_LINE_SIGN);
 
         String typeName = ret.getClass().getTypeName();
         if(typeName.equals("java.lang.String")){
-            reponseStr.append(ret);
+            responseStr.append(ret);
         }else if(typeName.equals("byte[]")){
 
         }
         else {
-            reponseStr.append(GsonUtils.toJson(ret));
+            responseStr.append(GsonUtils.toJson(ret));
         }
-        reponseStr.append(WRAN_LINE_SIGN);
-        reponseStr.append("--------------------------------------------------------------------------------------------------");
-        if(reponseStr.toString().length() > 2000){
-            _logger.info(reponseStr.toString().substring(0,1900)+"......");
+        responseStr.append(WRAN_LINE_SIGN);
+        responseStr.append("--------------------------------------------------------------------------------------------------");
+        if(responseStr.toString().length() > 3000){
+            _logger.info(responseStr.toString().substring(0,2990)+"......");
         }else {
-            _logger.info(reponseStr.toString());
+            _logger.info(responseStr.toString());
         }
     }
 
