@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>baseJPA</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
 
 
     <dependencies>
@@ -19,6 +19,12 @@
             <groupId>com.xc.common.server</groupId>
             <artifactId>baseCommon</artifactId>
             <version>${common.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.googlecode.log4jdbc</groupId>
+            <artifactId>log4jdbc</artifactId>
+            <version>1.2</version>
         </dependency>
 
         <!-- spring boot jpa -->
