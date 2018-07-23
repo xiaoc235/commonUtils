@@ -1,12 +1,9 @@
 package com.common.utils;
 
-import org.apache.commons.collections.CollectionUtils;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 
 /**
@@ -110,25 +107,6 @@ public final class ReflectionUtils {
 			}
 		}
 		throw new NoSuchFieldException("No such field: " + clazz.getName() + '.' + fieldName);
-	}
-	
-	/**
-	 * 循环向上,获取类的DeclaredFields
-	 * @param clazz
-	 * @return
-	 * @throws NoSuchFieldException
-	 */
-	public static final Field[] getDeclaredFields(Class clazz) throws NoSuchFieldException {		
-		//Assert.notNull(clazz);
-		Set<Field> tmp = new HashSet<Field>();
-		for (Class superClass = clazz; superClass != Object.class; superClass = superClass.getSuperclass()) {
-			try {
-				CollectionUtils.addAll(tmp, superClass.getDeclaredFields());
-			} catch (Exception e) {
-				// Field不在当前类定义,继续向上寻找
-			}
-		}
-		return tmp.toArray(new Field[0]);
 	}
 
 

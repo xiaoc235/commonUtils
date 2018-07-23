@@ -1,17 +1,27 @@
 package com.common.redis;
 
 import com.common.base.exception.BusinessException;
-import com.common.spring.utils.CommonUtils;
 import com.common.utils.GsonUtils;
 import com.google.gson.reflect.TypeToken;
+import io.lettuce.core.RedisURI;
+import io.lettuce.core.api.StatefulRedisConnection;
+import io.lettuce.core.api.async.RedisAsyncCommands;
+import io.lettuce.core.api.sync.RedisCommands;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPoolConfig;
+import org.springframework.util.ObjectUtils;
 
-import java.util.Set;
+import java.util.List;
 
+
+/**
+ *
+ * update jhm 20180721
+ * jedis --> luttuce
+ *
+ * get --> sync
+ * set & del --> async
+ */
 @Component("RedisClient")
 public class RedisClient {
 
@@ -22,49 +32,57 @@ public class RedisClient {
 		RedisClient.redisProperties = redisProperties;
 	}
 
-    //连接池
-	private static JedisPool jedisPool = null;
-
+    private static StatefulRedisConnection<String, String> connection = null;
+    private static io.lettuce.core.RedisClient lettuceRedis = null;
 	private static synchronized void initRedis(){
 		String passwd = redisProperties.getPassword();
 		String host = redisProperties.getHost();
 		String port = redisProperties.getPort();
-		JedisPoolConfig config = new JedisPoolConfig();
-		config.setMaxTotal(500);
-		config.setMaxIdle(100);
-		config.setMinIdle(5);//设置最小空闲数
-		config.setMaxWaitMillis(10000);
-		config.setTestOnBorrow(true);
-		config.setTestOnReturn(true);
-		//Idle时进行连接扫描
-		config.setTestWhileIdle(true);
-		//表示idle object evitor两次扫描之间要sleep的毫秒数
-		config.setTimeBetweenEvictionRunsMillis(30000);
-		//表示idle object evitor每次扫描的最多的对象数
-		config.setNumTestsPerEvictionRun(10);
-		//表示一个对象至少停留在idle状态的最短时间，然后才能被idle object evitor扫描并驱逐；这一项只有在timeBetweenEvictionRunsMillis大于0时才有意义
-		config.setMinEvictableIdleTimeMillis(60000);
-		if(CommonUtils.isBlank(passwd)) {
-			jedisPool = new JedisPool(config, host, Integer.parseInt(port), 10000);
-		}else{
-			jedisPool = new JedisPool(config, host, Integer.parseInt(port), 10000, passwd);
-		}
+        if(ObjectUtils.isEmpty(lettuceRedis)){
+            RedisURI uri = new RedisURI();
+            uri.setHost(host);
+            uri.setPort(Integer.parseInt(port));
+            if(!ObjectUtils.isEmpty(passwd)) {
+                uri.setPassword(passwd);
+            }
+            lettuceRedis = io.lettuce.core.RedisClient.create(uri);
+            connection = lettuceRedis.connect();
+        }
 	}
 
-	protected static Jedis getJedis(){
-		if(null == jedisPool) {
-			initRedis();
+    /**
+     * 异步
+     * @return
+     */
+	public RedisAsyncCommands<String, String> getAsyncCommand(){
+	    if(ObjectUtils.isEmpty(lettuceRedis)){
+	        initRedis();
+        }
+		if(ObjectUtils.isEmpty(connection)) {
+            connection = lettuceRedis.connect();
 		}
-		return jedisPool.getResource();
+		return connection.async();
 	}
 
-	private static void closeJedis(Jedis jedis){
-		if(null != jedis){
-			jedis.close();
+    /**
+     * 同步
+     * @return
+     */
+    public RedisCommands<String, String> getCommand(){
+        if(ObjectUtils.isEmpty(lettuceRedis)){
+            initRedis();
+        }
+        if(ObjectUtils.isEmpty(connection)) {
+            connection = lettuceRedis.connect();
+        }
+        return connection.sync();
+    }
+
+	public void closeConnection(){
+		if(ObjectUtils.isEmpty(connection)){
+            connection.close();
 		}
 	}
-
-
 
 	/**
 	 * 存入 String
@@ -74,13 +92,11 @@ public class RedisClient {
 	}
 
 	public void set(String key, String value, int seconds){
-		Jedis jedis = getJedis();
         if(seconds > 0) {
-            jedis.setex(key, seconds, value);
+            getAsyncCommand().setex(key, seconds, value);
         }else{
-            jedis.set(key,value);
+            getAsyncCommand().set(key,value);
         }
-		closeJedis(jedis);
 	}
 
 	/**
@@ -107,10 +123,7 @@ public class RedisClient {
 	 * @return String
 	 */
 	public String get(String key){
-		Jedis jedis = getJedis();
-		String value = jedis.get(key);
-		closeJedis(jedis);
-		return value;
+		return getCommand().get(key);
 	}
 	
 	/**
@@ -119,23 +132,12 @@ public class RedisClient {
 	 * @return object
 	 */
 	public <T> T get(String key, TypeToken<T> typeToken){
-		Jedis jedis = getJedis();
 		String json = get(key);
-		T result = GsonUtils.conver(json, typeToken);
-		closeJedis(jedis);
-		return result;
+		return  GsonUtils.conver(json, typeToken);
 	}
 
-	/**
-	 * @Title: 判断key是否存在
-	 * @author jianghaoming
-	 * @date 2017/1/13  14:28
-	 */
 	public Boolean exists(String key){
-		Jedis jedis = getJedis();
-		boolean flag = jedis.exists(key);
-		closeJedis(jedis);
-		return flag;
+		return getCommand().exists(key) > 0;
 	}
 
 	/**
@@ -146,7 +148,7 @@ public class RedisClient {
 	public void checkNull(String key) throws BusinessException
 	{
 		if(!exists(key)){
-			throw new BusinessException("未找到相关redis数据，key="+key);
+			throw new BusinessException("未找到相关redis数据，key :" + key);
 		}
 	}
 
@@ -158,49 +160,43 @@ public class RedisClient {
 	 */
 	public int getTtl(String key) throws BusinessException {
 		checkNull(key);
-		Jedis jedis = getJedis();
-		int result = Math.toIntExact(jedis.ttl(key));
-		closeJedis(jedis);
-		return result;
+		return Math.toIntExact(getCommand().ttl(key));
 	}
 
     /**
      * 获取key值列表
-     * @param pattern
-     * @return
      */
-	public Set<String> getKeys(String pattern){
-        Jedis jedis = getJedis();
-        jedis.keys(pattern);
-        return jedis.keys(pattern);
+	public List<String> getKeys(String pattern){
+        return getCommand().keys(pattern);
     }
 
 	/**
 	 * 删除
 	 */
 	public void delKey(String key){
-		Jedis jedis = getJedis();
-		jedis.del(key);
-		closeJedis(jedis);
+		getAsyncCommand().del(key);
 	}
+
+	public void delKeys(String pattern){
+        List<String> result = getKeys(pattern);
+        for(String key : result){
+            delKey(key);
+        }
+    }
 	
 	
 	/**
 	 * 清空DB
 	 */
 	 public void flushDB(){
-		 Jedis jedis = getJedis();
-		 jedis.flushDB();
-		 closeJedis(jedis);
+		 getCommand().flushdb();
 	 }
 	 
 	/**
 	 * 清空所有
 	 */
 	 public void flushAll(){
-		 Jedis jedis = getJedis();
-		 jedis.flushAll();
-		 closeJedis(jedis);
+		getCommand().flushall();
 	 }
 
 

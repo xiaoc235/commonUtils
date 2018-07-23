@@ -4,7 +4,6 @@ package com.common.base;
 import com.common.base.annotation.CanNullAnnotation;
 import com.common.base.exception.BusinessException;
 import com.common.utils.ReflectionUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
@@ -81,7 +80,7 @@ public class BaseDto implements Serializable {
                     message = fieldName+"不能为空";
                 }
 
-                if(StringUtils.isBlank(result)){
+                if(result == null || ("").equals(result) || ("null").equals(result)){
                     throw new BusinessException(message);
                 }else if("null".equals(result.toLowerCase())){
                     throw new BusinessException(message);

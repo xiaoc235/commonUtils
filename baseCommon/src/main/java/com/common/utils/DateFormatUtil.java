@@ -1,6 +1,5 @@
 package com.common.utils;
 
-import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Timestamp;
 import java.text.DateFormat;
@@ -226,7 +225,7 @@ public class DateFormatUtil {
     }
 
     public static Date string2date(String value) {
-        if (StringUtils.isBlank(value)) {
+        if (CommonUtils.isBlank(value)) {
             return null;
         }
         return string2date(value, "yyyy-MM-dd");

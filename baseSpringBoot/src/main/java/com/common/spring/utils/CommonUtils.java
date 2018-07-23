@@ -1,7 +1,7 @@
 package com.common.spring.utils;
 
 import com.common.base.exception.BusinessException;
-import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,6 +19,12 @@ public class CommonUtils extends com.common.utils.CommonUtils {
     private CommonUtils(){
         super();
     }
+
+
+    public static boolean isBlank(Object param){
+        return ObjectUtils.isEmpty(param);
+    }
+
 
     /**
      * 保存文件
@@ -62,7 +68,7 @@ public class CommonUtils extends com.common.utils.CommonUtils {
      * @return
      */
     public static String getMapParam(final String key, Map<String,Object> paramMap){
-        if (paramMap == null || paramMap.isEmpty() || StringUtils.isBlank(key)
+        if (paramMap == null || paramMap.isEmpty() || isBlank(key)
                 || !paramMap.containsKey(key)) {
             return null;
         }

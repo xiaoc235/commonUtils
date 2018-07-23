@@ -1,7 +1,6 @@
 package com.common.spring.utils;
 
 import com.common.base.exception.BusinessException;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -20,7 +19,7 @@ public class CheckUtils {
      * @param  param 参数，message 提示信息
      */
     public static void checkParamNull(final String param, final String message) throws BusinessException {
-        if(StringUtils.isBlank(param)){
+        if(CommonUtils.isBlank(param)){
             throw new BusinessException(message);
         }else if("null".equalsIgnoreCase(param)){
             throw new BusinessException(message);
@@ -28,7 +27,7 @@ public class CheckUtils {
     }
 
     public static void checkParamNullWithRetCode(final String param, final String message) throws BusinessException {
-        if(StringUtils.isBlank(param)){
+        if(CommonUtils.isBlank(param)){
             throw new BusinessException(HttpServletResponse.SC_BAD_REQUEST, message);
         }else if("null".equalsIgnoreCase(param)){
             throw new BusinessException(HttpServletResponse.SC_BAD_REQUEST, message);

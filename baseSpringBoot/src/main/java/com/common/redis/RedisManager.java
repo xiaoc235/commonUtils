@@ -2,7 +2,7 @@ package com.common.redis;
 
 import com.common.spring.ToolSpring;
 import com.google.gson.reflect.TypeToken;
-import redis.clients.jedis.Jedis;
+import io.lettuce.core.api.sync.RedisCommands;
 
 import java.util.List;
 
@@ -35,8 +35,8 @@ public class RedisManager {
     public static RedisClient getRedis(){
         return getInstance().getRedisClient();
     }
-    public static Jedis getJedis(){
-        return getRedis().getJedis();
+    public static RedisCommands<String,String> getCommand(){
+        return getRedis().getCommand();
     }
 
 

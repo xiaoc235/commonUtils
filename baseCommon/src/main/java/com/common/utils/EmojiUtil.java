@@ -1,7 +1,6 @@
 package com.common.utils;
 
 import com.common.base.exception.BusinessException;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +31,7 @@ public class EmojiUtil {
 	 * @throws BusinessException 
 	 */
 	public static String resolveToByteFromEmoji(String str) throws BusinessException {
-		if( StringUtils.isBlank(str) ){
+		if( CommonUtils.isBlank(str) ){
 			final String msg = "emoji表情字符为空";
 			//throw new BusinessException(msg);
 		}
@@ -62,7 +61,7 @@ public class EmojiUtil {
 	 * @throws BusinessException 
 	 */
 	public static String resolveToEmojiFromByte(String str) throws BusinessException {
-		if( StringUtils.isBlank(str) ){
+		if( CommonUtils.isBlank(str) ){
 			final String msg = "emoji表情字符为空";
 			throw new BusinessException(msg);
 		}

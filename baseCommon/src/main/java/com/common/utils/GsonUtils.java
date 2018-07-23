@@ -2,7 +2,6 @@ package com.common.utils;
 
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
-import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -37,7 +36,7 @@ public class GsonUtils {
      * <pre>
      */
     public static <T> List<T> convertList(String json, TypeToken<List<T>> token) {
-        if (StringUtils.isBlank(json)) {
+        if (CommonUtils.isBlank(json)) {
             return new ArrayList<T>();
         }
         return gson.fromJson(json, token.getType());
@@ -55,7 +54,7 @@ public class GsonUtils {
      */
     public static <T> T convertObjByDateFormat(String dateFormat ,String json, Class<T> cls) {
     	gsonByDateFormat = new GsonBuilder().setDateFormat(dateFormat).create();
-        if (StringUtils.isBlank(json)) {
+        if (CommonUtils.isBlank(json)) {
             return null;
         }
         return gsonByDateFormat.fromJson(json, cls);
@@ -74,7 +73,7 @@ public class GsonUtils {
      */
     public static <T> List<T> convertListByDateFormat(String dateFormat ,String json, Class<T> cls) {
     	gsonByDateFormat = new GsonBuilder().setDateFormat(dateFormat).create();
-    	if (StringUtils.isBlank(json)) {
+    	if (CommonUtils.isBlank(json)) {
     		return new ArrayList<T>();
     	}
     	Type type = new TypeToken<List<JsonObject>>() {
@@ -99,7 +98,7 @@ public class GsonUtils {
      * </pre>
      */
     public static <T> List<T> convertList(String json, Class<T> cls) {
-        if (StringUtils.isBlank(json)) {
+        if (CommonUtils.isBlank(json)) {
             return new ArrayList<T>();
         }
         Type type = new TypeToken<List<JsonObject>>() {
@@ -123,7 +122,7 @@ public class GsonUtils {
      * <pre>
      */
     public static <T> T convertObj(String json, Class<T> cls) {
-        if (StringUtils.isBlank(json)) {
+        if (CommonUtils.isBlank(json)) {
             return null;
         }
         return gson.fromJson(json, cls);
@@ -156,7 +155,7 @@ public class GsonUtils {
     }
 
     public static String getJsonObjectAsString(JsonObject jsonObject, String name) {
-        if (jsonObject == null || StringUtils.isBlank(name)) {
+        if (jsonObject == null || CommonUtils.isBlank(name)) {
             return null;
         }
         JsonElement jsonElement = jsonObject.get(name);
@@ -164,7 +163,7 @@ public class GsonUtils {
     }
 
     public static JsonObject getJsonObjectChild(JsonObject jsonObject, String name) {
-        if (jsonObject == null || StringUtils.isBlank(name)) {
+        if (jsonObject == null || CommonUtils.isBlank(name)) {
             return null;
         }
         JsonElement jsonElement = jsonObject.get(name);
@@ -172,7 +171,7 @@ public class GsonUtils {
     }
 
     public static boolean getJsonObjectAsBoolean(JsonObject jsonObject, String name) {
-        if (jsonObject == null || StringUtils.isBlank(name)) {
+        if (jsonObject == null || CommonUtils.isBlank(name)) {
             return false;
         }
         JsonElement jsonElement = jsonObject.get(name);

@@ -38,6 +38,12 @@ public class SerializeTest implements Serializable{
     }
 
 
+
+
+
+
+
+
     @Test
     public void testObj(){
         TestUser user = new TestUser("test1",1);

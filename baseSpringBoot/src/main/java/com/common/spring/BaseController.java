@@ -9,7 +9,6 @@ import com.common.redis.RedisClient;
 import com.common.spring.utils.CheckUtils;
 import com.common.spring.utils.CommonUtils;
 import com.common.utils.EmojiUtil;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.sql.SQLDataException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -105,7 +105,7 @@ public class BaseController {
      * @return
      */
     protected String getMapParam(final String key, Map<String,Object> paramMap){
-        if (paramMap == null || paramMap.isEmpty() || StringUtils.isBlank(key)
+        if (paramMap == null || paramMap.isEmpty() || CommonUtils.isBlank(key)
                 || !paramMap.containsKey(key)) {
             return null;
         }
@@ -248,6 +248,10 @@ public class BaseController {
             final String message = ex.getErrorDesc();
             _logger.info(CommConstants.BUSINESS_ERROR + message,ex);
             return failResponse(ex.getErrorCode(),message);
+        }catch (SQLDataException e){
+            final String message = CommConstants.DATA_ERROR;
+            _logger.error(message, e);
+            return errorResponse(message);
         }catch (Exception e) {
             final String message = CommConstants.SYSTEM_ERROR;
             _logger.error(message, e);

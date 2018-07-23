@@ -1,6 +1,5 @@
 package com.common.utils;
 
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,7 +35,7 @@ public class CommonUtils {
      * @return true 为空，false 不为空
      */
     public static boolean isBlank(final String param){
-        if(StringUtils.isBlank(param) || "null".equals(param.toLowerCase())){
+        if(param == null || ("").equals(param) || ("null").equalsIgnoreCase(param)){
             return true;
         }
         return false;
