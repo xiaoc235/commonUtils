@@ -7,7 +7,7 @@ import java.util.HashMap;
 
 public class BaseResponseDto<T> extends BaseDto {
 
-    private Boolean success;
+    private boolean success = false;
     private int code; //对应HttpServletResponse中的状态码
     private String message;
     private T data;
