@@ -27,7 +27,7 @@ public class BaseResponseDto<T> extends BaseDto {
     }
 
 
-    public boolean isSuccess() {
+    public boolean getSuccess() {
         return success;
     }
 
