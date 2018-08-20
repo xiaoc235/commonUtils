@@ -34,7 +34,7 @@
         <repository>
             <id>xc-hosted</id>
             <name>xc-hosted Repository</name>
-            <url>http://maven.1yuanfalv.com/nexus/repository/xc-hosted/</url>
+            <url>http://maven.guoranedu.com/repository/xc-hosted/</url>
         </repository>
     </distributionManagement>
 
@@ -42,7 +42,7 @@
         <repository>
             <id>nexus-xc</id>
             <name>nexus-xc</name>
-            <url>http://maven.1yuanfalv.com/nexus/repository/maven-public/</url>
+            <url>http://maven.guoranedu.com/repository/maven-public/</url>
         </repository>
     </repositories>
 
