@@ -169,9 +169,9 @@ public class BaseController {
             obj = nullMap;
         }
         if(message.contains(CommConstants.LOGIN_OUT_MESSAGE)){
-            return new ResponseEntity<>(new BaseResponseDto(CommStatusEnum.FAIL.isValue(),code,message,obj),HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(new BaseResponseDto<>(CommStatusEnum.FAIL.isValue(),code,message,obj),HttpStatus.UNAUTHORIZED);
         }
-        return new ResponseEntity<>(new BaseResponseDto(CommStatusEnum.FAIL.isValue(),code,message,obj),HttpStatus.OK);
+        return new ResponseEntity<>(new BaseResponseDto<>(CommStatusEnum.FAIL.isValue(),code,message,obj),HttpStatus.OK);
     }
 
 
@@ -181,7 +181,7 @@ public class BaseController {
      * @return
      */
     public ResponseEntity<BaseResponseDto> errorResponse(final int code,final String message){
-        return new ResponseEntity<>(new BaseResponseDto(CommStatusEnum.FAIL.isValue(),code,message,nullMap),HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(new BaseResponseDto<>(CommStatusEnum.FAIL.isValue(),code,message,nullMap),HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     /**
@@ -190,7 +190,7 @@ public class BaseController {
      * @return
      */
     public ResponseEntity<BaseResponseDto> errorResponse(HttpStatus httpStatus,final String message){
-        return new ResponseEntity<>(new BaseResponseDto(CommStatusEnum.FAIL.isValue(), HttpStatus.INTERNAL_SERVER_ERROR.value(),message,nullMap),httpStatus);
+        return new ResponseEntity<>(new BaseResponseDto<>(CommStatusEnum.FAIL.isValue(), HttpStatus.INTERNAL_SERVER_ERROR.value(),message,nullMap),httpStatus);
     }
 
     public ResponseEntity<BaseResponseDto> errorResponse(final String message){
@@ -227,18 +227,18 @@ public class BaseController {
             obj = nullMap;
         }
         if(isBlank(jsonKey)){
-            return new ResponseEntity<>(new BaseResponseDto(CommStatusEnum.SUCC.isValue(), CommStatusEnum.SUCC.getKey(), message, obj), HttpStatus.OK);
+            return new ResponseEntity<>(new BaseResponseDto<>(CommStatusEnum.SUCC.isValue(), CommStatusEnum.SUCC.getKey(), message, obj), HttpStatus.OK);
         }else {
             Map<String, Object> resultMap = new HashMap<>();
             resultMap.put(jsonKey, obj);
-            return new ResponseEntity<>(new BaseResponseDto(CommStatusEnum.SUCC.isValue(),CommStatusEnum.SUCC.getKey(), message, resultMap),HttpStatus.OK);
+            return new ResponseEntity<>(new BaseResponseDto<>(CommStatusEnum.SUCC.isValue(),CommStatusEnum.SUCC.getKey(), message, resultMap),HttpStatus.OK);
 
         }
     }
 
     @FunctionalInterface
     public interface Method{
-        ResponseEntity<BaseResponseDto> call() throws BusinessException, Exception;
+        ResponseEntity<BaseResponseDto> call() throws BusinessException;
     }
 
     public ResponseEntity<BaseResponseDto> calls(Method method){
@@ -248,10 +248,6 @@ public class BaseController {
             final String message = ex.getErrorDesc();
             _logger.info(CommConstants.BUSINESS_ERROR + message,ex);
             return failResponse(ex.getErrorCode(),message);
-        }catch (SQLDataException e){
-            final String message = CommConstants.DATA_ERROR;
-            _logger.error(message, e);
-            return errorResponse(message);
         }catch (Exception e) {
             final String message = CommConstants.SYSTEM_ERROR;
             _logger.error(message, e);
