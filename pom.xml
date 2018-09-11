@@ -4,20 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.xc.common.server</groupId>
+    <groupId>com.xc.common.utils</groupId>
     <artifactId>common</artifactId>
     <version>1.0</version>
     <packaging>pom</packaging>
 
     <modules>
-        <module>baseCommon</module>
-        <module>webServerMQ</module>
         <module>zxing</module>
-        <module>baseSpringBoot</module>
         <module>xcthumbnailator</module>
-        <module>baseJPA</module>
-        <module>qiniu</module>
-        <module>wechatMP</module>
         <module>workFilter</module>
     </modules>
 
@@ -25,8 +19,6 @@
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <spring.version>2.0.3.RELEASE</spring.version>
-        <common.version>2.0.0</common.version>
     </properties>
 
     <!-- jar包上传 -->
@@ -45,10 +37,6 @@
             <url>http://maven.guoranedu.com/repository/maven-public/</url>
         </repository>
     </repositories>
-
-
-
-
 
     <build>
         <plugins>
