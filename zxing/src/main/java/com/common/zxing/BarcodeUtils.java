@@ -24,16 +24,16 @@ import java.util.Map;
 public class BarcodeUtils {
 
     // 图片宽度的一般
-    private static final int IMAGE_WIDTH = 80;
-    private static final int IMAGE_HEIGHT = 80;
+    private static final int IMAGE_WIDTH = 150;
+    private static final int IMAGE_HEIGHT = 150;
     private static final int IMAGE_HALF_WIDTH = IMAGE_WIDTH / 2;
-    private static final int FRAME_WIDTH = 2;
+    private static final int FRAME_WIDTH = 1;
 
     // 二维码写码器
     private static MultiFormatWriter mutiWriter = new MultiFormatWriter();
 
-    private static final int width = 300;
-    private static final int height = 300;
+    private static final int width = 600;
+    private static final int height = 600;
     /**
      *
      * @param content 二维码内容
@@ -102,9 +102,10 @@ public class BarcodeUtils {
             }
         }
 
-        Map<EncodeHintType, Object> hint = new HashMap<EncodeHintType, Object>();
+        Map<EncodeHintType, Object> hint = new HashMap<>();
         hint.put(EncodeHintType.CHARACTER_SET, "utf-8");
         hint.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H);
+        hint.put(EncodeHintType.MARGIN, 2);
         // 生成二维码
         BitMatrix matrix = mutiWriter.encode(content, BarcodeFormat.QR_CODE,
                 width, height, hint);
@@ -192,26 +193,28 @@ public class BarcodeUtils {
                     AffineTransform.getScaleInstance(ratio, ratio), null);
             destImage = op.filter(srcImage, null);
         }
+        BufferedImage image = new BufferedImage(width, height,
+                BufferedImage.TYPE_INT_RGB);
+        Graphics2D graphic = image.createGraphics();
+        graphic.setColor(Color.white);
+        graphic.fillRect(0, 0, width, height);
         if (hasFiller) {// 补白
-            BufferedImage image = new BufferedImage(width, height,
-                    BufferedImage.TYPE_INT_RGB);
-            Graphics2D graphic = image.createGraphics();
-            graphic.setColor(Color.white);
-            graphic.fillRect(0, 0, width, height);
-            if (width == destImage.getWidth(null))
+            if (width == destImage.getWidth(null)) {
                 graphic.drawImage(destImage, 0,
                         (height - destImage.getHeight(null)) / 2,
                         destImage.getWidth(null), destImage.getHeight(null),
                         Color.white, null);
-            else
+            }else {
                 graphic.drawImage(destImage,
                         (width - destImage.getWidth(null)) / 2, 0,
                         destImage.getWidth(null), destImage.getHeight(null),
                         Color.white, null);
-            graphic.dispose();
-            destImage = image;
+            }
+            return image;
         }
-        return (BufferedImage) destImage;
+        graphic.drawImage(destImage,0, 0,null);
+        graphic.dispose();
+        return  image;
     }
 
 
