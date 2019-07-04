@@ -130,7 +130,7 @@ public class ElasticClient {
      * @return
      * @throws IOException
      */
-    public List<String> search(String[] nameFiled, String keyWord, String[] indexName, SearchPage page) throws IOException {
+    public SearchResult<String> search(String[] nameFiled, String keyWord, String[] indexName, SearchPage page) throws IOException {
         SearchRequest request = new SearchRequest(indexName);
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
         QueryBuilder queryBuilder = QueryBuilders.multiMatchQuery(keyWord,nameFiled)
@@ -168,17 +168,17 @@ public class ElasticClient {
                 resultList.add(GsonUtils.anotherToJson(sourceMap));
             }
         }
-        return resultList;
+        return SearchResult.of(resultList, response.getHits().getTotalHits().value);
     }
 
-    public <T> List<T> search(String[] nameFiled, String key, String[] indexName, SearchPage page, TypeToken<List<T>> typeToken) throws IOException {
-        List<String> jsonList = this.search(nameFiled, key, indexName, page);
+    public <T> SearchResult<T> search(String[] nameFiled, String key, String[] indexName, SearchPage page, TypeToken<List<T>> typeToken) throws IOException {
+        SearchResult<String> jsonList = this.search(nameFiled, key, indexName, page);
         List<T> resultList = new ArrayList<>();
-        if(jsonList == null || jsonList.isEmpty()){
-            return resultList;
+        if(jsonList == null || jsonList.getTotalCount() == 0){
+            return SearchResult.of(resultList, 0);
         }
-        resultList = GsonUtils.convertList(jsonList.toString(), typeToken);
-        return resultList;
+        resultList = GsonUtils.convertList(jsonList.getResultList().toString(), typeToken);
+        return SearchResult.of(resultList, jsonList.getTotalCount());
     }
 
 }

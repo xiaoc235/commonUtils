@@ -6,6 +6,7 @@ import com.google.gson.reflect.TypeToken;
 import com.xc.elastic.client.ElasticClient;
 import com.xc.elastic.client.ElasticEntity;
 import com.xc.elastic.client.SearchPage;
+import com.xc.elastic.client.SearchResult;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -110,7 +111,7 @@ public class NormTest {
 
     @Test
     public void get() throws IOException {
-        ElasticEntity elasticEntity = ElasticEntity.of("test","id1");
+        ElasticEntity elasticEntity = ElasticEntity.of("article","251");
         String result = client.get(elasticEntity);
         System.out.println(result);
     }
@@ -135,14 +136,13 @@ public class NormTest {
 
 
     @Test
-    public void search() throws IOException {
+    public void searchPage() throws IOException {
         for(int page = 0; page <11; page ++) {
             System.out.println("第"+ (page + 1) + "页");
-            String result = GsonUtils.toJson(client.search(new String[]{"name"}, "姓名", new String[]{"test"},SearchPage.of(page)));
+            String result = GsonUtils.anotherToJson(client.search(new String[]{"name"}, "姓名", new String[]{"test"},SearchPage.of(page)).getResultList());
             System.out.println(result);
         }
     }
-
 
     @Test
     public void addInfo() throws IOException {
@@ -187,15 +187,15 @@ public class NormTest {
 
     @Test
     public void search2() throws IOException {
-       List<String> result = client.search(new String[]{"title","keyWord","author","description","content"}, "起向", new String[]{"article"},SearchPage.NULL_PAGE);
-       result.forEach(System.out::println);
+       SearchResult<String> result = client.search(new String[]{"title","keyWord","author","description","content"}, "起向", new String[]{"article"},SearchPage.NULL_PAGE);
+       result.getResultList().forEach(System.out::println);
         System.out.println(result.toString());
     }
 
     @Test
     public void search3() throws IOException {
-        List<ArticleTestModel> result = client.search(new String[]{"title","keyWord","author","description","content"},
+        SearchResult<ArticleTestModel> result = client.search(new String[]{"title","keyWord","author","description","content"},
                 "起向", new String[]{"article"},SearchPage.NULL_PAGE, ArticleTestModel.LIST_TYPE_TOKEN);
-        result.forEach( r -> System.out.println(r.getContent()));
+        result.getResultList().forEach( r -> System.out.println(r.getContent()));
     }
 }
