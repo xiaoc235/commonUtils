@@ -7,6 +7,7 @@ import com.xc.elastic.client.ElasticClient;
 import com.xc.elastic.client.ElasticEntity;
 import com.xc.elastic.client.SearchPage;
 import com.xc.elastic.client.SearchResult;
+import org.apache.http.HttpHost;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -15,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 public class NormTest {
-    ElasticClient client = ElasticClient.create("127.0.0.1",9200);
+    ElasticClient client = ElasticClient.create(new HttpHost("127.0.0.1",9200));
 
     public static class ArticleTestModel extends BaseEntity {
         public static final TypeToken<List<ArticleTestModel>> LIST_TYPE_TOKEN = new TypeToken<List<ArticleTestModel>>(){};

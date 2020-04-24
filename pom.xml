@@ -13,6 +13,7 @@
         <module>zxing</module>
         <module>xcthumbnailator</module>
         <module>workFilter</module>
+        <module>elasticSearchClient</module>
     </modules>
 
     <properties>

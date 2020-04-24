@@ -1,18 +1,14 @@
 package com.xc.elastic.client;
 
 import com.common.utils.GsonUtils;
-import com.fasterxml.jackson.core.JsonParser;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import org.apache.http.HttpHost;
+import org.elasticsearch.action.DocWriteRequest;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.search.SearchAction;
 import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.RequestOptions;
@@ -20,12 +16,12 @@ import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.common.unit.Fuzziness;
-import org.elasticsearch.common.xcontent.XContentHelper;
 import org.elasticsearch.common.xcontent.XContentType;
-import org.elasticsearch.common.xcontent.json.JsonXContent;
-import org.elasticsearch.index.mapper.ObjectMapper;
+import org.elasticsearch.index.engine.Engine;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.script.mustache.SearchTemplateRequest;
+import org.elasticsearch.script.mustache.SearchTemplateResponse;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
@@ -42,9 +38,9 @@ public class ElasticClient {
     private static RestHighLevelClient restHighLevelClient;
     private static ElasticClient elasticClient;
 
-    public static ElasticClient create(String hostname, int port){
+
+    public static ElasticClient create(HttpHost... httpHost){
         elasticClient = new ElasticClient();
-        HttpHost httpHost = new HttpHost(hostname,port);
         restHighLevelClient = new RestHighLevelClient(RestClient.builder(httpHost));
         return elasticClient;
     }
@@ -67,6 +63,7 @@ public class ElasticClient {
         request.source(json, XContentType.JSON);
         getRestClient().index(request, RequestOptions.DEFAULT);
     }
+
     public void createIndex(ElasticEntity entity, Map<String,Object> map) throws IOException {
         this.createIndex(entity,GsonUtils.toJson(map));
     }
@@ -123,32 +120,10 @@ public class ElasticClient {
      * 搜索
      * @author jianghaoming
      * @date 2019-07-02 17:41:54
-     * @param nameFiled 需要搜索的字段名
-     * @param keyWord 搜索关键字
-     * @param indexName 索引名称
-     * @param page 分页
-     * @return
      * @throws IOException
      */
-    public SearchResult<String> search(String[] nameFiled, String keyWord, String[] indexName, SearchPage page) throws IOException {
-        SearchRequest request = new SearchRequest(indexName);
-        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
-        QueryBuilder queryBuilder = QueryBuilders.multiMatchQuery(keyWord,nameFiled)
-                .fuzziness(Fuzziness.ZERO);
-        sourceBuilder.query(queryBuilder);
-        if(page != null) {
-            sourceBuilder.from(page.getPage() * page.getSize());
-            sourceBuilder.size(page.getSize());
-        }
-        HighlightBuilder highlightBuilder = new HighlightBuilder();
-        highlightBuilder.preTags("<span name='els-result' class='els-result'>");
-        highlightBuilder.postTags("</span>");
-        for(String filed : nameFiled){
-            highlightBuilder.fields().add(new HighlightBuilder.Field(filed));
-        }
-        sourceBuilder.highlighter(highlightBuilder);
-        request.source(sourceBuilder);
-        SearchResponse response = getRestClient().search(request, RequestOptions.DEFAULT);
+    public SearchResult<String> search(SearchRequest searchRequest) throws IOException {
+        SearchResponse response = getRestClient().search(searchRequest, RequestOptions.DEFAULT);
         SearchHit[] searchHits = response.getHits().getHits();
         List<String> resultList = new ArrayList<>();
         for(SearchHit searchHit : searchHits){
@@ -171,8 +146,8 @@ public class ElasticClient {
         return SearchResult.of(resultList, response.getHits().getTotalHits().value);
     }
 
-    public <T> SearchResult<T> search(String[] nameFiled, String key, String[] indexName, SearchPage page, TypeToken<List<T>> typeToken) throws IOException {
-        SearchResult<String> jsonList = this.search(nameFiled, key, indexName, page);
+    public <T> SearchResult<T> search(SearchRequest searchRequest, TypeToken<List<T>> typeToken) throws IOException {
+        SearchResult<String> jsonList = this.search(searchRequest);
         List<T> resultList = new ArrayList<>();
         if(jsonList == null || jsonList.getTotalCount() == 0){
             return SearchResult.of(resultList, 0);
