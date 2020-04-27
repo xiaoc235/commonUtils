@@ -22,12 +22,12 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
 
-    <!-- jar包上传 -->
+
     <distributionManagement>
         <repository>
-            <id>xc-hosted</id>
+            <id>jhm-hosted</id>
             <name>xc-hosted Repository</name>
-            <url>http://maven.guoranedu.com/repository/xc-hosted/</url>
+            <url>http://package.31huiyi.com/repository/xc-hosted/</url>
         </repository>
     </distributionManagement>
 
@@ -35,7 +35,7 @@
         <repository>
             <id>nexus-xc</id>
             <name>nexus-xc</name>
-            <url>http://maven.guoranedu.com/repository/maven-public/</url>
+            <url>http://package.31huiyi.com/repository/maven-public/</url>
         </repository>
     </repositories>
 
